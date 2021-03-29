@@ -49,7 +49,11 @@
           </div>
         </div>
         <div v-for="(video, index) in videosList" :key="index">
-          <video-list-item :video="video" @removeVideo="removeVideo(video.id)" />
+          <video-list-item
+            :video="video"
+            @removeVideo="removeVideo(video.id)"
+            @onAnaliseVideo="analiseVideo(video.id)"
+          />
         </div>
       </v-card-text>
     </v-card>
@@ -85,6 +89,11 @@ export default {
     this.indexedDBVideos = (await this.db.getAll('store')) || []
     this.requestPermissions()
   },
+
+  // TODO CONTINUE HERE
+  // GET THE SUBSCRIPTION WITH APOLLO SO SEE IF THE DATA ON THE DATABASE FOR THE VIDEOS EXISTING
+  // OR NOT
+
   methods: {
     /**
      * Open Video File
@@ -133,7 +142,6 @@ export default {
         console.error(e)
       }
     },
-
     async removeVideo(id) {
       this.videosList.splice(
         this.videosList.findIndex((video) => video.id === id),
@@ -215,6 +223,10 @@ export default {
       }
       // The user didn't grant permission, so return false.
       return false
+    },
+
+    analiseVideo(videoId) {
+      console.log('🎹', videoId)
     },
   },
 }
