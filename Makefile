@@ -44,7 +44,7 @@ hasura-apply-metadata:
 	cd hasura && npx hasura metadata apply  --admin-secret adminpassword # --endpoint http://another-graphql-instance.herokuapp.com
 
 hasura-apply-migrations:
-	cd hasura && npx hasura metadata apply --admin-secret adminpassword
+	cd hasura && npx hasura migrate apply --admin-secret adminpassword
 
 hasura-restore-full:
 	cat db/dev.dumpall.sql | docker exec -i postgres-container psql -U postgres -d postgres < db/dev.dumpall.sql

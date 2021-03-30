@@ -49,11 +49,7 @@
           </div>
         </div>
         <div v-for="(video, index) in videosList" :key="index">
-          <video-list-item
-            :video="video"
-            @removeVideo="removeVideo(video.id)"
-            @onAnaliseVideo="analiseVideo(video.id)"
-          />
+          <video-list-item :video="video" @removeVideo="removeVideo(video.id)" @onAnaliseVideo="analiseVideo(video)" />
         </div>
       </v-card-text>
     </v-card>
@@ -93,8 +89,20 @@ export default {
   // TODO CONTINUE HERE
   // GET THE SUBSCRIPTION WITH APOLLO SO SEE IF THE DATA ON THE DATABASE FOR THE VIDEOS EXISTING
   // OR NOT
+  // MOVE THE OPENING FUNCTIONALITY TO HERE.
+  // MAYBE ALSO MOVE THE generating the SHA into a utils file to make cleaner this compoennt.
+  // TODO CONTINUE HERE
 
   methods: {
+    async analiseVideo(video) {
+      console.log('🎹', video)
+
+      // Navigate to the screen if the video is not being processed
+      if (!this.isProcessing) {
+        await this.$store.dispatch('videos/selectVideo', this.$props.video)
+        this.$router.push({ name: 'erd', query: { video: this.video.id } })
+      }
+    },
     /**
      * Open Video File
      */
@@ -223,10 +231,6 @@ export default {
       }
       // The user didn't grant permission, so return false.
       return false
-    },
-
-    analiseVideo(videoId) {
-      console.log('🎹', videoId)
     },
   },
 }

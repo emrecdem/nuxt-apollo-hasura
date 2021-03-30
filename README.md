@@ -59,7 +59,7 @@ docker exec -i erd-postgres createdb -U postgres postgres
 ```
 And then, import the data dump and apply the hasura metadata:
 ```shell
-docker exec -i erd-postgres psql --username postgres postgres < ./dump.sql
+docker exec -i erd-postgres psql --username postgres postgres < ./CI/dev-data-dump.sql
 yarn hasura-metadata-apply
 ```
 
