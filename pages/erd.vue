@@ -32,7 +32,7 @@ export default {
       return this.$store.state.features.selectedFeatures
     },
     selectedFeatures() {
-      return this.featureNames.filter((filed) => filed.active)
+      return this.featureNames?.filter((filed) => filed.active)
     },
     featureNamesStore() {
       return this.$store.state.features.featureNames
@@ -42,7 +42,7 @@ export default {
     get_feature_names: {
       query: get_feature_names,
       result({ data, loading, networkStatus }) {
-        if (data) {
+        if (data && data.get_feature_names) {
           const featureNames = data.get_feature_names.fields
             .map((field) => ({
               label: field.name,

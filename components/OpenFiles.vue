@@ -50,6 +50,7 @@
         </div>
         <div v-for="(video, index) in videosList" :key="index">
           <video-list-item :video="video" @removeVideo="removeVideo(video.id)" @onAnaliseVideo="analiseVideo(video)" />
+          <v-btn text @click="navigateToVideo(video)"> Go</v-btn>
         </div>
       </v-card-text>
     </v-card>
@@ -99,9 +100,13 @@ export default {
 
       // Navigate to the screen if the video is not being processed
       if (!this.isProcessing) {
-        await this.$store.dispatch('videos/selectVideo', this.$props.video)
-        this.$router.push({ name: 'erd', query: { video: this.video.id } })
+        await this.$store.dispatch('videos/selectVideo', video)
+        // todo
       }
+    },
+    // todo delete this after making the api call correctly
+    navigateToVideo(video) {
+      this.$router.push({ name: 'erd', query: { video: video.id } })
     },
     /**
      * Open Video File
