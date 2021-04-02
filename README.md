@@ -16,6 +16,8 @@ make reset-db-to-defaults
 yarn hasura-console #http://localhost:9596
 ```
 ## Development
+![image](https://user-images.githubusercontent.com/4195550/113403878-9f844780-93a7-11eb-9c64-d17b44eca9f7.png)
+
 ```shell
 yarn dev # http://localhost:3000
 ```
