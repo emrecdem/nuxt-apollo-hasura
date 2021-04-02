@@ -1,0 +1,14 @@
+{
+  "name": "upload-server",
+  "version": "1.0.0",
+  "description": "Upload and store files in the server folder",
+  "main": "upload-server.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "forever upload-server.js"
+  },
+  "devDependencies": {
+    "express-fileupload": "^1.2.1",
+    "forever": "^3.0.4"
+  }
+}
