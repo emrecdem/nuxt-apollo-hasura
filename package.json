@@ -6,7 +6,7 @@
   "organization": "NLeSC eScienceCenter",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"docker-compose up -d\" \"nuxt\"",
+    "dev": "concurrently \"docker-compose up -d\" \"nuxt\" \"cd upload-server && yarn start\"",
     "hasura-console": "cd hasura && hasura console --admin-secret adminpassword",
     "hasura-metadata-apply": "cd hasura && hasura metadata apply --admin-secret adminpassword",
     "stop": "docker-compose down",

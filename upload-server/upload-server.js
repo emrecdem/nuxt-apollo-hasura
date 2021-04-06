@@ -10,9 +10,7 @@ app.post('/upload', function (req, res) {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.')
   }
-
   const files = req.files
-  console.log('🎹', Object.values(files))
   try {
     // Use the mv() method to place the file somewhere on your server
     Object.values(files).map((file) => {
