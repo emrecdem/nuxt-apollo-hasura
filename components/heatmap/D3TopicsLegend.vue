@@ -17,14 +17,18 @@ export default {
       x: null,
       yAxis: null,
       xAxis: null,
-      videoId: -1,
+      videoId: null,
       height: 200,
       width: 300,
       margins: { top: 0, right: 0, bottom: 0, left: 0 },
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+    video_hash() {
+      // Retrieve selected video from vuex store
+      return this.$store.state.videos.selectedVideo?.hash
+    },
+  },
   apollo: {
     video_id: {
       query: video_id,
@@ -35,7 +39,7 @@ export default {
       },
       result({ data, loading, networkStatus }) {
         if (data) {
-          this.videoId = data.video_id.id
+          this.videoId = data.video_id[0].id
         }
       },
       error(error) {
@@ -48,6 +52,9 @@ export default {
         return {
           video: this.videoId,
         }
+      },
+      skip: ({ videoId }) => {
+        return videoId === null
       },
       result({ data, loading, networkStatus }) {
         if (data) {

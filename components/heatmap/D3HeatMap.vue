@@ -26,7 +26,7 @@ export default {
       yAxisGroup: null,
       xAxisGroup: null,
       cursorWidth: 5,
-      videoId: -1,
+      videoId: null,
       endTime: 0,
       startTime: 0,
       resolution: 1,
@@ -80,15 +80,19 @@ export default {
       },
       result({ data, loading, networkStatus }) {
         if (data) {
-          this.videoId = data.video_id.id
+          this.videoId = data.video_id[0].id
         }
       },
       error(error) {
         this.error = JSON.stringify(error.message)
       },
     },
+
     end_time: {
       query: end_time,
+      skip: ({ videoId }) => {
+        return videoId === null
+      },
       variables() {
         return {
           video: this.videoId,
@@ -103,11 +107,15 @@ export default {
         this.error = JSON.stringify(error.message)
       },
     },
+
     topics: {
       variables() {
         return {
           video: this.videoId, // todo: select the current video
         }
+      },
+      skip: ({ videoId }) => {
+        return videoId === null
       },
       query: get_topics,
       result({ data }) {
@@ -116,9 +124,13 @@ export default {
         }
       },
     },
+
     aggregate_features: {
       // graphql query
       query: aggregate_features,
+      skip: ({ endTime }) => {
+        return endTime === 0
+      },
       variables() {
         return {
           duration: this.endTime,
@@ -126,7 +138,7 @@ export default {
         }
       },
       result({ data, loading, networkStatus }) {
-        if (data && data.aggregate_features.length > 0) {
+        if (data?.aggregate_features.length > 0) {
           this.aggregateData = data.aggregate_features
           this.updateChart()
         }
@@ -135,9 +147,13 @@ export default {
         console.error('🚨 Error in query aggregate_features:', error)
       },
     },
+
     data_aggregate: {
       // graphql query
       query: data_aggregate,
+      skip: ({ videoId }) => {
+        return videoId === null
+      },
       variables() {
         return {
           video: this.videoId,
@@ -171,10 +187,10 @@ export default {
       })
     },
     updateChart() {
-      if (this.normalization && this.aggregateData && this.aggregateData.length > 0 && this.normalizationData) {
+      if (this.normalization && this.aggregateData?.length > 0 && this.normalizationData) {
         this.chartData = this.normalize(this.aggregateData, this.normalizationData)
         this.drawChart()
-      } else if (!this.normalization && this.aggregateData && this.aggregateData.length > 0) {
+      } else if (!this.normalization && this.aggregateData?.length > 0) {
         this.chartData = this.longify(this.aggregateData)
         this.drawChart()
       }
@@ -182,7 +198,7 @@ export default {
     /**
      * Format data for the graph
      */
-    longify(rows) {
+    longify(rows = []) {
       const extracted = []
       rows.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
@@ -218,7 +234,7 @@ export default {
     /**
      * Normalize data for the graph
      */
-    normalize(aggregateData, normalizationData) {
+    normalize(aggregateData = [], normalizationData) {
       const extracted = []
       aggregateData.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
@@ -236,12 +252,12 @@ export default {
               value: row[feature.label],
             })
           } else {
+            const average = normalizationData[feature.label]?.average
+            const stddev = normalizationData[feature.label]?.stddev
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
-              value:
-                (row[feature.label] - normalizationData[feature.label].average) /
-                normalizationData[feature.label].stddev,
+              value: (row[feature.label] - average) / stddev,
             })
           }
         })
@@ -337,7 +353,7 @@ export default {
         .selectAll('.tick')
         .style('cursor', 'pointer')
         .data(this.activeFeatures)
-        ._groups[0].forEach((d) => {
+        ._groups[0]?.forEach((d) => {
           d3.select(d)
             .on('mouseover', function (event, data) {
               if (data.description) {
