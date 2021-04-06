@@ -10,7 +10,7 @@
     </v-row>
     <v-row>
       <v-col lg="10">
-        <D3HeatMap :features="selected_features" :normalization="normalization" />
+        <D3HeatMap :normalization="normalization" />
       </v-col>
       <v-col lg="2">
         <D3TopicsLegend></D3TopicsLegend>
