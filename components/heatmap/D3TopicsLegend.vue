@@ -5,6 +5,7 @@
 <script>
 import * as d3 from 'd3'
 import get_topics from '~/apollo/get_topics'
+import video_id from '~/apollo/video_id'
 
 export default {
   props: {},
@@ -16,20 +17,44 @@ export default {
       x: null,
       yAxis: null,
       xAxis: null,
-      height: 160,
+      videoId: null,
+      height: 200,
       width: 300,
       margins: { top: 0, right: 0, bottom: 0, left: 0 },
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+    video_hash() {
+      // Retrieve selected video from vuex store
+      return this.$store.state.videos.selectedVideo?.hash
+    },
+  },
   apollo: {
+    video_id: {
+      query: video_id,
+      variables() {
+        return {
+          hash: this.video_hash,
+        }
+      },
+      result({ data, loading, networkStatus }) {
+        if (data) {
+          this.videoId = data.video_id[0].id
+        }
+      },
+      error(error) {
+        this.error = JSON.stringify(error.message)
+      },
+    },
     topics: {
       query: get_topics,
       variables() {
         return {
-          video: 1,
+          video: this.videoId,
         }
+      },
+      skip: ({ videoId }) => {
+        return videoId === null
       },
       result({ data, loading, networkStatus }) {
         if (data) {

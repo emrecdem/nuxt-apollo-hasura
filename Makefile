@@ -31,7 +31,8 @@ restore-data:
 	@echo "Waking up hasura container..."
 	@./scripts/wait-for localhost:`docker port erd-hasura | sed 's/\(.*\)\/.*/\1/'`
 	docker exec -i erd-postgres psql --username postgres postgres < ./CI/dev-data-dump.sql
-	npx yarn hasura-metadata-apply
+	make hasura-apply-migrations
+	make hasura-apply-metadata 
 	@echo "DONE."
 
 

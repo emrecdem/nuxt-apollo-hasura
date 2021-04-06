@@ -6,11 +6,14 @@
 import * as d3 from 'd3'
 import { mapGetters } from 'vuex'
 import aggregate_features from '~/apollo/aggregate_features'
+import data_aggregate from '~/apollo/data_aggregate'
 import end_time from '~/apollo/end_time'
+import video_id from '~/apollo/video_id'
 import get_topics from '~/apollo/get_topics'
 export default {
   props: {
     features: { type: Array, default: () => [], required: false },
+    normalization: { type: Boolean, default: () => false, required: false },
   },
   data() {
     return {
@@ -23,13 +26,16 @@ export default {
       yAxisGroup: null,
       xAxisGroup: null,
       cursorWidth: 5,
+      videoId: null,
       endTime: 0,
       startTime: 0,
       resolution: 1,
       chartData: [],
-      height: 500,
+      aggregateData: [],
+      normalizationData: [],
+      height: 600,
       width: 1000,
-      margins: { top: 0, right: 0, bottom: 20, left: 50 },
+      margins: { top: 0, right: 20, bottom: 20, left: 50 },
       localCursor: 0,
       topics: [],
     }
@@ -44,6 +50,10 @@ export default {
     featuresNames() {
       return this.activeFeatures.map((feature) => feature.label)
     },
+    video_hash() {
+      // Retrieve selected video from vuex store
+      return this.$store.state.videos.selectedVideo?.hash
+    },
   },
   watch: {
     cursor(newPosition) {
@@ -57,29 +67,37 @@ export default {
     activeFeatures() {
       this.updateChart()
       this.$apollo.queries.aggregate_features.refetch()
+      this.$apollo.queries.data_aggregate.refetch()
     },
   },
   apollo: {
-    aggregate_features: {
-      // graphql query
-      query: aggregate_features,
+    video_id: {
+      query: video_id,
       variables() {
         return {
-          duration: this.endTime,
+          hash: this.video_hash,
         }
       },
       result({ data, loading, networkStatus }) {
-        if (data && data.aggregate_features.length > 0) {
-          this.chartData = this.longify(data.aggregate_features)
-          this.updateChart()
+        if (data) {
+          this.videoId = data.video_id[0].id
         }
       },
       error(error) {
-        console.error('🚨 Error in query aggregate_features:', error)
+        this.error = JSON.stringify(error.message)
       },
     },
+
     end_time: {
       query: end_time,
+      skip: ({ videoId }) => {
+        return videoId === null
+      },
+      variables() {
+        return {
+          video: this.videoId,
+        }
+      },
       result({ data, loading, networkStatus }) {
         if (data) {
           this.endTime = Math.ceil(data.end_time.aggregate.max.timestamp)
@@ -89,17 +107,66 @@ export default {
         this.error = JSON.stringify(error.message)
       },
     },
+
     topics: {
       variables() {
         return {
-          video: 1, // todo: select the current video
+          video: this.videoId, // todo: select the current video
         }
+      },
+      skip: ({ videoId }) => {
+        return videoId === null
       },
       query: get_topics,
       result({ data }) {
         if (data) {
           this.topics = data
         }
+      },
+    },
+
+    aggregate_features: {
+      // graphql query
+      query: aggregate_features,
+      skip: ({ endTime }) => {
+        return endTime === 0
+      },
+      variables() {
+        return {
+          duration: this.endTime,
+          hash: this.video_hash,
+        }
+      },
+      result({ data, loading, networkStatus }) {
+        if (data?.aggregate_features.length > 0) {
+          this.aggregateData = data.aggregate_features
+          this.updateChart()
+        }
+      },
+      error(error) {
+        console.error('🚨 Error in query aggregate_features:', error)
+      },
+    },
+
+    data_aggregate: {
+      // graphql query
+      query: data_aggregate,
+      skip: ({ videoId }) => {
+        return videoId === null
+      },
+      variables() {
+        return {
+          video: this.videoId,
+        }
+      },
+      result({ data, loading, networkStatus }) {
+        if (this.normalization && data) {
+          this.normalizationData = this.deUnderscore(data.data_aggregate.aggregate)
+          this.updateChart()
+        }
+      },
+      error(error) {
+        console.error('🚨 Error in query normalized_aggregate:', error)
       },
     },
   },
@@ -120,14 +187,18 @@ export default {
       })
     },
     updateChart() {
-      if (this.chartData && this.chartData.length > 0) {
+      if (this.normalization && this.aggregateData?.length > 0 && this.normalizationData) {
+        this.chartData = this.normalize(this.aggregateData, this.normalizationData)
+        this.drawChart()
+      } else if (!this.normalization && this.aggregateData?.length > 0) {
+        this.chartData = this.longify(this.aggregateData)
         this.drawChart()
       }
     },
     /**
      * Format data for the graph
      */
-    longify(rows) {
+    longify(rows = []) {
       const extracted = []
       rows.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
@@ -143,6 +214,50 @@ export default {
               frame: row.min_timestamp,
               variable: feature.label,
               value: row[feature.label],
+            })
+          }
+        })
+      })
+      return extracted
+    },
+    deUnderscore(aggregate) {
+      const result = []
+      const keys = Object.keys(aggregate.avg)
+      keys.forEach(function (key) {
+        result[key.replace(/_/i, '').toLowerCase()] = {
+          average: aggregate.avg[key],
+          stddev: aggregate.stddev[key],
+        }
+      })
+      return result
+    },
+    /**
+     * Normalize data for the graph
+     */
+    normalize(aggregateData = [], normalizationData) {
+      const extracted = []
+      aggregateData.forEach((row) => {
+        this.activeFeatures.forEach((feature) => {
+          if (feature.label === 'topic') {
+            const d = this.topics.topics.find((topic) => topic.index === row[feature.label])
+            extracted.push({
+              frame: row.min_timestamp,
+              variable: feature.label,
+              value: d?.description,
+            })
+          } else if (feature.label === 'silence' || feature.label === 'success') {
+            extracted.push({
+              frame: row.min_timestamp,
+              variable: feature.label,
+              value: row[feature.label],
+            })
+          } else {
+            const average = normalizationData[feature.label]?.average
+            const stddev = normalizationData[feature.label]?.stddev
+            extracted.push({
+              frame: row.min_timestamp,
+              variable: feature.label,
+              value: (row[feature.label] - average) / stddev,
             })
           }
         })
@@ -238,7 +353,7 @@ export default {
         .selectAll('.tick')
         .style('cursor', 'pointer')
         .data(this.activeFeatures)
-        ._groups[0].forEach((d) => {
+        ._groups[0]?.forEach((d) => {
           d3.select(d)
             .on('mouseover', function (event, data) {
               if (data.description) {
@@ -258,12 +373,20 @@ export default {
         })
 
       // Build color scale
-      const myColor = d3.scaleSequential().domain([0, 5]).interpolator(d3.interpolateInferno)
+
       const topicColor = d3.scaleOrdinal(d3.schemeCategory10)
       const successColor = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateRdYlGn)
-      const pitchColor = d3.scaleSequential().domain([0, 255]).interpolator(d3.interpolateViridis)
-      const intensityColor = d3.scaleSequential().domain([0, 100]).interpolator(d3.interpolatePlasma)
       const silenceColor = d3.scaleOrdinal(d3.schemeSet1)
+
+      let myColor = d3.scaleSequential().domain([0, 5]).interpolator(d3.interpolateInferno)
+      let pitchColor = d3.scaleSequential().domain([0, 255]).interpolator(d3.interpolateViridis)
+      let intensityColor = d3.scaleSequential().domain([0, 100]).interpolator(d3.interpolatePlasma)
+
+      if (this.normalization) {
+        myColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
+        intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
+      }
 
       // Group for main content
       this.cells = chartGroup
@@ -286,7 +409,7 @@ export default {
           } else if (d.variable === 'success') {
             return successColor(d.value)
           } else if (d.variable.endsWith('c')) {
-            return myColor(d.value * 4)
+            return myColor(d.value)
           } else if (d.variable === 'pitch') {
             return pitchColor(d.value)
           } else if (d.variable === 'intensity') {

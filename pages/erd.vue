@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row>
       <v-col lg="6">
         <tabs />
@@ -9,9 +9,19 @@
       </v-col>
     </v-row>
     <v-row>
-      <D3HeatMap :features="selectedFeatures" />
+      <v-col lg="10">
+        <D3HeatMap :normalization="normalization" />
+      </v-col>
+      <v-col lg="2">
+        <D3TopicsLegend></D3TopicsLegend>
+        <D3GradientLegend v-if="!normalization"></D3GradientLegend>
+        <D3DivergingLegend v-if="normalization"></D3DivergingLegend>
+        <D3BinaryLegend></D3BinaryLegend>
+      </v-col>
     </v-row>
-    <ActionButtons></ActionButtons>
+    <v-row>
+      <ActionButtons></ActionButtons>
+    </v-row>
   </v-container>
 </template>
 
@@ -25,6 +35,7 @@ export default {
       isPlaying: false,
       cursor: 0,
       featureNames: [],
+      normalization: true,
     }
   },
   computed: {
