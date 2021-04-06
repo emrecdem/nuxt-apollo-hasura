@@ -71,43 +71,6 @@ export default {
     },
   },
   apollo: {
-    aggregate_features: {
-      // graphql query
-      query: aggregate_features,
-      variables() {
-        return {
-          duration: this.endTime,
-          hash: this.video_hash,
-        }
-      },
-      result({ data, loading, networkStatus }) {
-        if (data && data.aggregate_features.length > 0) {
-          this.aggregateData = data.aggregate_features
-          this.updateChart()
-        }
-      },
-      error(error) {
-        console.error('🚨 Error in query aggregate_features:', error)
-      },
-    },
-    data_aggregate: {
-      // graphql query
-      query: data_aggregate,
-      variables() {
-        return {
-          video: this.videoId,
-        }
-      },
-      result({ data, loading, networkStatus }) {
-        if (this.normalization && data) {
-          this.normalizationData = this.deUnderscore(data.data_aggregate.aggregate)
-          this.updateChart()
-        }
-      },
-      error(error) {
-        console.error('🚨 Error in query normalized_aggregate:', error)
-      },
-    },
     video_id: {
       query: video_id,
       variables() {
@@ -151,6 +114,43 @@ export default {
         if (data) {
           this.topics = data
         }
+      },
+    },
+    aggregate_features: {
+      // graphql query
+      query: aggregate_features,
+      variables() {
+        return {
+          duration: this.endTime,
+          hash: this.video_hash,
+        }
+      },
+      result({ data, loading, networkStatus }) {
+        if (data && data.aggregate_features.length > 0) {
+          this.aggregateData = data.aggregate_features
+          this.updateChart()
+        }
+      },
+      error(error) {
+        console.error('🚨 Error in query aggregate_features:', error)
+      },
+    },
+    data_aggregate: {
+      // graphql query
+      query: data_aggregate,
+      variables() {
+        return {
+          video: this.videoId,
+        }
+      },
+      result({ data, loading, networkStatus }) {
+        if (this.normalization && data) {
+          this.normalizationData = this.deUnderscore(data.data_aggregate.aggregate)
+          this.updateChart()
+        }
+      },
+      error(error) {
+        console.error('🚨 Error in query normalized_aggregate:', error)
       },
     },
   },

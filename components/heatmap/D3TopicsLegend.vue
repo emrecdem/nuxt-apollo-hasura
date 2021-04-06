@@ -5,6 +5,7 @@
 <script>
 import * as d3 from 'd3'
 import get_topics from '~/apollo/get_topics'
+import video_id from '~/apollo/video_id'
 
 export default {
   props: {},
@@ -16,6 +17,7 @@ export default {
       x: null,
       yAxis: null,
       xAxis: null,
+      videoId: -1,
       height: 200,
       width: 300,
       margins: { top: 0, right: 0, bottom: 0, left: 0 },
@@ -24,11 +26,27 @@ export default {
   computed: {},
   watch: {},
   apollo: {
+    video_id: {
+      query: video_id,
+      variables() {
+        return {
+          hash: this.video_hash,
+        }
+      },
+      result({ data, loading, networkStatus }) {
+        if (data) {
+          this.videoId = data.video_id.id
+        }
+      },
+      error(error) {
+        this.error = JSON.stringify(error.message)
+      },
+    },
     topics: {
       query: get_topics,
       variables() {
         return {
-          video: 1,
+          video: this.videoId,
         }
       },
       result({ data, loading, networkStatus }) {
