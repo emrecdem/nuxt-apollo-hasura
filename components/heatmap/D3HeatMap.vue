@@ -25,7 +25,7 @@ export default {
       x: null,
       yAxisGroup: null,
       xAxisGroup: null,
-      cursorWidth: 5,
+      cursorWidth: 10,
       videoId: -1,
       endTime: 0,
       startTime: 0,
@@ -63,6 +63,11 @@ export default {
       this.cursorLine.attr('x', (d) => {
         return this.cursorScale(d)
       })
+    },
+    normalization(newValue, oldValue) {
+      if (oldValue !== newValue) {
+        this.updateChart()
+      }
     },
     activeFeatures() {
       this.updateChart()
@@ -467,13 +472,16 @@ export default {
         .enter()
         .append('rect')
         .attr('class', 'cursorline')
+        .attr('fill', '#4EC0FF')
+        // .attr('opacity', '0.5')
+        // .attr('stroke', 'black')
+        // .attr('stroke-width', '1')
         .attr('x', (d) => {
           return this.cursorScale(d)
         })
         .attr('y', 0)
         .attr('width', this.cursorWidth)
         .attr('height', this.chartHeight - this.margins.bottom)
-        .attr('fill', '#4EC0FF')
         .call(dragHandler(this))
 
       function zoomHandler(that) {
@@ -485,7 +493,6 @@ export default {
         function zoomed(event) {
           that.xScale.range([0, that.chartWidth].map((d) => event.transform.applyX(d)))
           that.cells.attr('x', (d) => that.xScale(d.frame)).attr('width', that.xScale.bandwidth())
-          that.cursorLine.attr('transform', event.transform)
           that.xAxisGroup.call(that.xAxis)
         }
 

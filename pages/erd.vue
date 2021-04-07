@@ -13,15 +13,20 @@
         <D3HeatMap :normalization="normalization" />
       </v-col>
       <v-col lg="2">
+        <v-row justify="center" align="center">
+          <v-col lg="8"><v-card-text>Normalize</v-card-text></v-col>
+          <v-col lg="4"><v-switch v-model="normalization" inset></v-switch></v-col
+        ></v-row>
+
         <D3TopicsLegend></D3TopicsLegend>
         <D3GradientLegend v-if="!normalization"></D3GradientLegend>
         <D3DivergingLegend v-if="normalization"></D3DivergingLegend>
         <D3BinaryLegend></D3BinaryLegend>
       </v-col>
     </v-row>
-    <v-row>
+    <!-- <v-row>
       <ActionButtons></ActionButtons>
-    </v-row>
+    </v-row> -->
   </v-container>
 </template>
 
