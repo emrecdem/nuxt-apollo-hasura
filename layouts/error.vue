@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container>
       <v-app>
         <h1 v-if="error.statusCode === 404">
@@ -11,7 +11,7 @@
         <NuxtLink to="/"> Home page </NuxtLink>
       </v-app>
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
