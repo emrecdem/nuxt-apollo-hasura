@@ -257,7 +257,7 @@ export default {
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
-              value: (row[feature.label] - average) / stddev,
+              value: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
             })
           }
         })
