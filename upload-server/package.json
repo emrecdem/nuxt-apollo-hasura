@@ -7,8 +7,11 @@
   "scripts": {
     "start": "forever upload-server.js"
   },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1"
+  },
   "devDependencies": {
-    "express-fileupload": "^1.2.1",
     "forever": "^3.0.4"
   }
 }

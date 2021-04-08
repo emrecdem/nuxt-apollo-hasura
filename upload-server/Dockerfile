@@ -6,8 +6,6 @@ COPY package.json ./
 RUN yarn
 
 COPY . .
-EXPOSE 3000
-
-RUN yarn build
+EXPOSE 7000
 
 CMD [ "yarn", "start" ]
