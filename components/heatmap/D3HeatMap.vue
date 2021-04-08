@@ -29,7 +29,7 @@ export default {
       videoId: null,
       endTime: 0,
       startTime: 0,
-      resolution: 1,
+      resolution: 0.1,
       chartData: [],
       aggregateData: [],
       normalizationData: [],
@@ -135,6 +135,7 @@ export default {
         return {
           duration: this.endTime,
           hash: this.video_hash,
+          resolution: this.resolution,
         }
       },
       result({ data, loading, networkStatus }) {
@@ -304,7 +305,7 @@ export default {
         .attr('height', this.chartHeight)
 
       // Labels for row & column
-      const timeBins = d3.range(this.startTime, this.endTime, 1)
+      const timeBins = d3.range(this.startTime, this.endTime, this.resolution)
       const tickValues = d3.range(this.startTime, this.endTime, 30)
       const formatDuration = (d) => new Date(1000 * d).toISOString().substr(14, 5)
 
@@ -379,11 +380,13 @@ export default {
       const silenceColor = d3.scaleOrdinal(d3.schemeSet1)
 
       let myColor = d3.scaleSequential().domain([0, 5]).interpolator(d3.interpolateInferno)
+      let myColorC = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateInferno)
       let pitchColor = d3.scaleSequential().domain([0, 255]).interpolator(d3.interpolateViridis)
       let intensityColor = d3.scaleSequential().domain([0, 100]).interpolator(d3.interpolatePlasma)
 
       if (this.normalization) {
         myColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        myColorC = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
         pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
         intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
       }
@@ -409,7 +412,7 @@ export default {
           } else if (d.variable === 'success') {
             return successColor(d.value)
           } else if (d.variable.endsWith('c')) {
-            return myColor(d.value)
+            return myColorC(d.value)
           } else if (d.variable === 'pitch') {
             return pitchColor(d.value)
           } else if (d.variable === 'intensity') {
@@ -499,13 +502,22 @@ export default {
         ]
 
         function zoomed(event) {
-          that.xScale.range([0, that.chartWidth].map((d) => event.transform.applyX(d)))
+          // const timeBins = d3.range(that.startTime, that.endTime, 1.0 / event.transform.k)
+          console.log(1.0 / event.transform.k)
+          console.log(timeBins.length)
+          that.xScale
+            .range(
+              [0, that.chartWidth].map((d) => event.transform.applyX(d)),
+              that.resolution
+            )
+            .domain(timeBins)
+            .padding(0.0)
           that.cells.attr('x', (d) => that.xScale(d.frame)).attr('width', that.xScale.bandwidth())
           that.cursorLine.attr('transform', event.transform)
           that.xAxisGroup.call(that.xAxis)
         }
 
-        return d3.zoom().scaleExtent([1, 20]).translateExtent(extent).extent(extent).on('zoom', zoomed)
+        return d3.zoom().scaleExtent([1, 10]).translateExtent(extent).extent(extent).on('zoom', zoomed)
       }
 
       this.svg.call(zoomHandler(this))
