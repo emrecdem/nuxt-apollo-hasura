@@ -222,7 +222,7 @@ export default {
               frame: row.min_timestamp,
               variable: feature.label,
               value: row[feature.label],
-              normalization: stddev === 0 ? 0 : (row[feature.label] - average) / stddev,
+              zscore: stddev === 0 ? 0 : (row[feature.label] - average) / stddev,
               description: feature.description,
             })
           }
@@ -267,8 +267,8 @@ export default {
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
-              actualValue: row[feature.label],
-              value: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
+              value: row[feature.label],
+              zscore: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
               description: feature.description,
             })
           }
@@ -360,7 +360,7 @@ export default {
         .style('border-width', '2px')
         .style('border-radius', '5px')
         .style('padding', '5px')
-        .style('min-width', '250px')
+        .style('min-width', '300px')
       this.yAxisGroup
         .selectAll('.tick')
         .style('cursor', 'pointer')
@@ -443,18 +443,14 @@ export default {
               .html(
                 `<div>
                 <div>
-                <span>Variable:  </span>
+                <span>Feature:  </span>
                 <span>` +
                   d.variable +
+                  (d.description ? '-' + d.description : '') +
                   `</span>
                 </div>
                 <div>
-                <span>Description:  </span><span>` +
-                  d.description +
-                  `</span>
-                </div>
-                <div>
-                <span>Frame/current time:  </span><span>` +
+                <span>Time:  </span><span>` +
                   currentTime +
                   `</span>
                 </div>
@@ -463,12 +459,10 @@ export default {
                   d.value +
                   `</span>
                 </div>
-                <div>` +
-                  '' +
-                  (!this.normalization
-                    ? '<span>Normalization:  </span><span>' + d.normalization + '</span>'
-                    : '<span>Actual Value:  </span><span>' + d.actualValue + '</span>') +
-                  `
+                <div>
+                <span>Z-Score:  </span><span>` +
+                  d.zscore +
+                  `</span>
                 </div>
                 </div>`
               )
@@ -532,7 +526,10 @@ export default {
         .enter()
         .append('rect')
         .attr('class', 'cursorline')
-        .attr('fill', '#4EC0FF')
+        .attr('fill', (d) => (this.normalization ? '#4EC0FF' : '#fff'))
+        .attr('opacity', '0.5')
+        .attr('stroke', 'black')
+        .attr('stroke-width', '1')
         .attr('x', (d) => {
           return this.cursorScale(d)
         })
