@@ -219,6 +219,7 @@ export default {
               frame: row.min_timestamp,
               variable: feature.label,
               value: row[feature.label],
+              description: feature.description,
             })
           }
         })
@@ -263,6 +264,7 @@ export default {
               frame: row.min_timestamp,
               variable: feature.label,
               value: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
+              description: feature.description,
             })
           }
         })
@@ -353,7 +355,6 @@ export default {
         .style('border-width', '2px')
         .style('border-radius', '5px')
         .style('padding', '5px')
-
       this.yAxisGroup
         .selectAll('.tick')
         .style('cursor', 'pointer')
@@ -392,7 +393,6 @@ export default {
         pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
         intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
       }
-
       // Group for main content
       this.cells = chartGroup
         .append('g')
@@ -428,7 +428,31 @@ export default {
           tooltip.style('display', 'block')
           tooltip.transition().duration(200).style('opacity', 0.9)
           tooltip
-            .html(d.value)
+            .html(
+              `<div>
+                <div>
+                <span>Value:  </span>
+                <span>` +
+                d.value +
+                `</span>
+                </div>
+                <div>
+                <span>Frame:  </span><span>` +
+                d.frame +
+                `</span>
+                </div>
+                <div>
+                <span>Variable:  </span><span>` +
+                d.variable +
+                `</span>
+                </div>
+                 <div>
+                <span>Description:  </span><span>` +
+                d.description +
+                `</span>
+                </div>
+                </div>`
+            )
             .style('left', event.layerX + 20 + 'px')
             .style('top', event.layerY + 'px')
             .style('opacity', 1)
@@ -489,9 +513,6 @@ export default {
         .append('rect')
         .attr('class', 'cursorline')
         .attr('fill', '#4EC0FF')
-        // .attr('opacity', '0.5')
-        // .attr('stroke', 'black')
-        // .attr('stroke-width', '1')
         .attr('x', (d) => {
           return this.cursorScale(d)
         })
