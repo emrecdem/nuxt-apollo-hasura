@@ -513,8 +513,6 @@ export default {
             resolution = 1.0
           }
           const timeBins = d3.range(that.startTime, that.endTime, resolution)
-          console.log(resolution)
-          console.log(timeBins.length)
 
           that.xScale
             .range(
