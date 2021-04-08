@@ -4,8 +4,8 @@
       <div v-for="(feature, index) in featureNames" :key="index">
         <v-tooltip bottom transition="none" :disabled="!feature.description">
           <template #activator="{ on }">
-            <v-chip filter outlined :value="feature.name" v-on="on">
-              {{ feature.name }}
+            <v-chip filter outlined :value="feature.label" v-on="on">
+              {{ feature.label }}
             </v-chip>
           </template>
           <span>{{ feature.description }}</span>
