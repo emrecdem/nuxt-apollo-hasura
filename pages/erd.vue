@@ -69,7 +69,7 @@ export default {
               return filed.label !== 'grouped_seconds' && filed.label !== 'min_timestamp'
             })
           this.featureNames = featureNames
-          this.$store.commit('features/UPDATE_FEATURES_NAME', data.get_feature_names.fields)
+          this.$store.commit('features/UPDATE_FEATURES_NAME', this.featureNames)
         }
       },
       error(error) {
