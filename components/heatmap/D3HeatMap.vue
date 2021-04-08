@@ -305,7 +305,7 @@ export default {
         .attr('height', this.chartHeight)
 
       // Labels for row & column
-      const timeBins = d3.range(this.startTime, this.endTime, this.resolution)
+      const timeBins = d3.range(this.startTime, this.endTime, 1.0)
       const tickValues = d3.range(this.startTime, this.endTime, 30)
       const formatDuration = (d) => new Date(1000 * d).toISOString().substr(14, 5)
 
@@ -502,9 +502,20 @@ export default {
         ]
 
         function zoomed(event) {
-          // const timeBins = d3.range(that.startTime, that.endTime, 1.0 / event.transform.k)
-          console.log(1.0 / event.transform.k)
+          let resolution = 1.0 / event.transform.k
+          if (resolution > 0 && resolution < 0.2) {
+            resolution = 0.1
+          } else if (resolution > 0.2 && resolution < 0.5) {
+            resolution = 0.2
+          } else if (resolution > 0.5 && resolution < 1.0) {
+            resolution = 0.5
+          } else {
+            resolution = 1.0
+          }
+          const timeBins = d3.range(that.startTime, that.endTime, resolution)
+          console.log(resolution)
           console.log(timeBins.length)
+
           that.xScale
             .range(
               [0, that.chartWidth].map((d) => event.transform.applyX(d)),
