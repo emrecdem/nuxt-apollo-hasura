@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar clipped-left fixed app dense>
+    <v-app-bar fixed app dense>
       <nuxt-link to="/" style="text-decoration: none; color: initial">
         <div class="d-flex">
           <v-icon color="#555">mdi-account-box-outline</v-icon>
@@ -9,11 +9,11 @@
       </nuxt-link>
       <v-spacer />
     </v-app-bar>
-    <v-content>
-      <v-container fluid>
+    <v-main>
+      <v-container fluid style="margin-top: 26px">
         <nuxt />
       </v-container>
-    </v-content>
+    </v-main>
     <v-footer app class="flex">
       <img
         src="https://www.esciencecenter.nl/wp-content/themes/raadhuis/dist/assets/img/favicons/apple-touch-icon.png"
