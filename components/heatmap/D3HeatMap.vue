@@ -166,7 +166,7 @@ export default {
         }
       },
       result({ data, loading, networkStatus }) {
-        if (this.normalization && data) {
+        if (data) {
           this.normalizationData = this.deUnderscore(data.data_aggregate.aggregate)
           this.updateChart()
         }
@@ -197,29 +197,34 @@ export default {
         this.chartData = this.normalize(this.aggregateData, this.normalizationData)
         this.drawChart()
       } else if (!this.normalization && this.aggregateData?.length > 0) {
-        this.chartData = this.longify(this.aggregateData)
+        this.chartData = this.longify(this.aggregateData, this.normalizationData)
         this.drawChart()
       }
     },
     /**
      * Format data for the graph
      */
-    longify(rows = []) {
+    longify(rows = [], normalizationData) {
       const extracted = []
       rows.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
           if (feature.label === 'topic') {
             const d = this.topics.topics.find((topic) => topic.index === row[feature.label])
+
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
               value: d?.description,
             })
           } else {
+            const average = normalizationData[feature.label]?.average
+            const stddev = normalizationData[feature.label]?.stddev
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
               value: row[feature.label],
+              zscore: stddev === 0 ? 0 : (row[feature.label] - average) / stddev,
+              description: feature.description,
             })
           }
         })
@@ -263,7 +268,9 @@ export default {
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
-              value: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
+              value: row[feature.label],
+              zscore: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
+              description: feature.description,
             })
           }
         })
@@ -354,7 +361,7 @@ export default {
         .style('border-width', '2px')
         .style('border-radius', '5px')
         .style('padding', '5px')
-
+        .style('min-width', '300px')
       this.yAxisGroup
         .selectAll('.tick')
         .style('cursor', 'pointer')
@@ -395,7 +402,6 @@ export default {
         pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
         intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
       }
-
       // Group for main content
       this.cells = chartGroup
         .append('g')
@@ -428,13 +434,45 @@ export default {
           return myColor(d.value)
         })
         .on('mouseover', (event, d) => {
-          tooltip.style('display', 'block')
-          tooltip.transition().duration(200).style('opacity', 0.9)
-          tooltip
-            .html(d.value)
-            .style('left', event.layerX + 20 + 'px')
-            .style('top', event.layerY + 'px')
-            .style('opacity', 1)
+          const currentTime = new Date(this.cursor * 1000).toISOString().substr(11, 8)
+          if (d.variable === 'topic') {
+            tooltip.style('display', 'block')
+            tooltip.transition().duration(200).style('opacity', 0.9)
+            tooltip.html(d.value ? d.value : 'Geen beschrijving')
+          } else {
+            tooltip.style('display', 'block')
+            tooltip.transition().duration(200).style('opacity', 0.9)
+            tooltip
+              .html(
+                `<div>
+                <div>
+                <span>Feature:  </span>
+                <span>` +
+                  d.variable +
+                  (d.description ? '-' + d.description : '') +
+                  `</span>
+                </div>
+                <div>
+                <span>Time:  </span><span>` +
+                  currentTime +
+                  `</span>
+                </div>
+                 <div>
+                <span>Value:  </span><span>` +
+                  d.value +
+                  `</span>
+                </div>
+                <div>
+                <span>Z-Score:  </span><span>` +
+                  d.zscore +
+                  `</span>
+                </div>
+                </div>`
+              )
+              .style('left', event.layerX + 20 + 'px')
+              .style('top', event.layerY + 'px')
+              .style('opacity', 1)
+          }
         })
         .on('mouseleave', () => tooltip.style('display', 'none'))
       this.cells.exit().remove()
