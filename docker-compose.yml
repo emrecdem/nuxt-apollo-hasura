@@ -34,16 +34,6 @@ services:
       - "./hasura/migrations:/hasura-migrations"
       - "./hasura/metadata:/hasura-metadata"
 
-  upload_server:
-    build: ./upload-server
-    container_name: erd-upload-server
-    command: yarn start
-    volumes:
-      - ./upload-server:/usr/src/app
-    working_dir: /usr/src/app
-    ports:
-      - "7000:7000"
 
 volumes:
   db_data:
-

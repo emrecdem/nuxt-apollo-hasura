@@ -96,10 +96,21 @@ Making test api-calls:
 -   header: "api-key":"in1uP28Y1Et9YGp95VLYzhm5Jgd5M1r0CKI7326RHwbVcHGa"
 -   body/json: {"name": "Workflow name test","workflow": "cwl/sleep.cwl","input": {"time": "3s"}}
 
-Once the response is recieved: you can call again with GET
+Once the response is received: you can call again with GET
 to the uri provided in the response.
 
-create a folder called cwl inside the xenon-flow folder (you got from cloning the repo) and place inside the `sleep.cwl` file you will find in the `CI` folder
+Create a folder called cwl inside the xenon-flow folder (you got from cloning the repo) and place inside the `sleep.cwl` file you will find in the `CI` folder
+
+Open `application.properties` file to disable ssl and choose the port (if needed it).
+```shell
+server.port=9050
+server.ssl.enabled=false
+```
+
+Edit the xenon `config` file, change your local's folder to access the input files.
+```shell
+location: ${XENONFLOW_HOME}
+```
 
 
 # Deploy production
