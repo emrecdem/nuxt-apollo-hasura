@@ -28,8 +28,8 @@ export const getters = {
     return state.featureNames
       .map((field) => {
         return {
-          label: field.name,
-          active: state.selectedFeatures.includes(field.name),
+          label: field.label,
+          active: state.selectedFeatures.includes(field.label),
           description: field.description,
         }
       })

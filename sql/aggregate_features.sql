@@ -1,10 +1,7 @@
-CREATE OR REPLACE FUNCTION public.aggregate_features(start_time double precision, end_time double precision, resolution numeric, video_hash character varying)
- RETURNS SETOF agg_result
- LANGUAGE sql
- STABLE
-AS $function$
+CREATE OR REPLACE FUNCTION public.aggregate_features(start_time double precision, end_time double precision, resolution double precision, video_hash character varying)
+ RETURNS SETOF agg_result AS $$
 select
-  min(timestamp) as min_timestamp,
+  FLOOR(timestamp / resolution) * resolution as min_timestamp,
   avg("AU01_r"),
   avg("AU02_r"),
   avg("AU04_r"),
@@ -55,5 +52,5 @@ where
   AND v.hash = video_hash
 group by
   grouped_seconds
-order by min(timestamp);
-$function$;
+order by min_timestamp;
+$$ LANGUAGE sql STABLE;

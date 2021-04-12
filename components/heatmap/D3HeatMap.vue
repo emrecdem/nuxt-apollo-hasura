@@ -25,11 +25,11 @@ export default {
       x: null,
       yAxisGroup: null,
       xAxisGroup: null,
-      cursorWidth: 5,
-      videoId: null,
+      cursorWidth: 10,
+      videoId: -1,
       endTime: 0,
       startTime: 0,
-      resolution: 1,
+      resolution: 0.1,
       chartData: [],
       aggregateData: [],
       normalizationData: [],
@@ -63,6 +63,11 @@ export default {
       this.cursorLine.attr('x', (d) => {
         return this.cursorScale(d)
       })
+    },
+    normalization(newValue, oldValue) {
+      if (oldValue !== newValue) {
+        this.updateChart()
+      }
     },
     activeFeatures() {
       this.updateChart()
@@ -135,6 +140,7 @@ export default {
         return {
           duration: this.endTime,
           hash: this.video_hash,
+          resolution: this.resolution,
         }
       },
       result({ data, loading, networkStatus }) {
@@ -160,7 +166,7 @@ export default {
         }
       },
       result({ data, loading, networkStatus }) {
-        if (this.normalization && data) {
+        if (data) {
           this.normalizationData = this.deUnderscore(data.data_aggregate.aggregate)
           this.updateChart()
         }
@@ -191,29 +197,34 @@ export default {
         this.chartData = this.normalize(this.aggregateData, this.normalizationData)
         this.drawChart()
       } else if (!this.normalization && this.aggregateData?.length > 0) {
-        this.chartData = this.longify(this.aggregateData)
+        this.chartData = this.longify(this.aggregateData, this.normalizationData)
         this.drawChart()
       }
     },
     /**
      * Format data for the graph
      */
-    longify(rows = []) {
+    longify(rows = [], normalizationData) {
       const extracted = []
       rows.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
           if (feature.label === 'topic') {
             const d = this.topics.topics.find((topic) => topic.index === row[feature.label])
+
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
               value: d?.description,
             })
           } else {
+            const average = normalizationData[feature.label]?.average
+            const stddev = normalizationData[feature.label]?.stddev
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
               value: row[feature.label],
+              zscore: stddev === 0 ? 0 : (row[feature.label] - average) / stddev,
+              description: feature.description,
             })
           }
         })
@@ -257,7 +268,9 @@ export default {
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,
-              value: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
+              value: row[feature.label],
+              zscore: stddev === 0 ? 0 : (row[feature.label] - average) / stddev, // if standard deviation is 0, keep
+              description: feature.description,
             })
           }
         })
@@ -304,7 +317,7 @@ export default {
         .attr('height', this.chartHeight)
 
       // Labels for row & column
-      const timeBins = d3.range(this.startTime, this.endTime, 1)
+      const timeBins = d3.range(this.startTime, this.endTime, 1.0)
       const tickValues = d3.range(this.startTime, this.endTime, 30)
       const formatDuration = (d) => new Date(1000 * d).toISOString().substr(14, 5)
 
@@ -348,7 +361,8 @@ export default {
         .style('border-width', '2px')
         .style('border-radius', '5px')
         .style('padding', '5px')
-
+        .style('min-width', '300px')
+        .style('z-index', '1111')
       this.yAxisGroup
         .selectAll('.tick')
         .style('cursor', 'pointer')
@@ -379,15 +393,16 @@ export default {
       const silenceColor = d3.scaleOrdinal(d3.schemeSet1)
 
       let myColor = d3.scaleSequential().domain([0, 5]).interpolator(d3.interpolateInferno)
+      let myColorC = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateInferno)
       let pitchColor = d3.scaleSequential().domain([0, 255]).interpolator(d3.interpolateViridis)
       let intensityColor = d3.scaleSequential().domain([0, 100]).interpolator(d3.interpolatePlasma)
 
       if (this.normalization) {
         myColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        myColorC = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
         pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
         intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
       }
-
       // Group for main content
       this.cells = chartGroup
         .append('g')
@@ -409,7 +424,7 @@ export default {
           } else if (d.variable === 'success') {
             return successColor(d.value)
           } else if (d.variable.endsWith('c')) {
-            return myColor(d.value)
+            return myColorC(d.value)
           } else if (d.variable === 'pitch') {
             return pitchColor(d.value)
           } else if (d.variable === 'intensity') {
@@ -420,13 +435,44 @@ export default {
           return myColor(d.value)
         })
         .on('mouseover', (event, d) => {
-          tooltip.style('display', 'block')
-          tooltip.transition().duration(200).style('opacity', 0.9)
-          tooltip
-            .html(d.value)
-            .style('left', event.layerX + 20 + 'px')
-            .style('top', event.layerY + 'px')
-            .style('opacity', 1)
+          if (d.variable === 'topic') {
+            tooltip.style('display', 'block')
+            tooltip.transition().duration(200).style('opacity', 0.9)
+            tooltip.html(d.value ? d.value : 'Geen beschrijving')
+          } else {
+            tooltip.style('display', 'block')
+            tooltip.transition().duration(200).style('opacity', 0.9)
+            tooltip
+              .html(
+                `<div>
+                <div>
+                <span>Feature:  </span>
+                <span>` +
+                  d.variable +
+                  (d.description ? '-' + d.description : '') +
+                  `</span>
+                </div>
+                <div>
+                <span>Time:  </span><span>` +
+                  formatDuration(d.frame) +
+                  `</span>
+                </div>
+                 <div>
+                <span>Value:  </span><span>` +
+                  d.value +
+                  `</span>
+                </div>
+                <div>
+                <span>Z-Score:  </span><span>` +
+                  d.zscore +
+                  `</span>
+                </div>
+                </div>`
+              )
+              .style('left', event.layerX + 20 + 'px')
+              .style('top', event.layerY + 'px')
+              .style('opacity', 1)
+          }
         })
         .on('mouseleave', () => tooltip.style('display', 'none'))
       this.cells.exit().remove()
@@ -483,13 +529,16 @@ export default {
         .enter()
         .append('rect')
         .attr('class', 'cursorline')
+        .attr('fill', (d) => (this.normalization ? '#4EC0FF' : '#fff'))
+        .attr('opacity', '0.5')
+        .attr('stroke', 'black')
+        .attr('stroke-width', '1')
         .attr('x', (d) => {
           return this.cursorScale(d)
         })
         .attr('y', 0)
         .attr('width', this.cursorWidth)
         .attr('height', this.chartHeight - this.margins.bottom)
-        .attr('fill', '#4EC0FF')
         .call(dragHandler(this))
 
       function zoomHandler(that) {
@@ -499,13 +548,30 @@ export default {
         ]
 
         function zoomed(event) {
-          that.xScale.range([0, that.chartWidth].map((d) => event.transform.applyX(d)))
+          let resolution = 1.0 / event.transform.k
+          if (resolution > 0 && resolution < 0.2) {
+            resolution = 0.1
+          } else if (resolution > 0.2 && resolution < 0.5) {
+            resolution = 0.2
+          } else if (resolution > 0.5 && resolution < 1.0) {
+            resolution = 0.5
+          } else {
+            resolution = 1.0
+          }
+          const timeBins = d3.range(that.startTime, that.endTime, resolution)
+
+          that.xScale
+            .range(
+              [0, that.chartWidth].map((d) => event.transform.applyX(d)),
+              that.resolution
+            )
+            .domain(timeBins)
+            .padding(0.0)
           that.cells.attr('x', (d) => that.xScale(d.frame)).attr('width', that.xScale.bandwidth())
-          that.cursorLine.attr('transform', event.transform)
           that.xAxisGroup.call(that.xAxis)
         }
 
-        return d3.zoom().scaleExtent([1, 20]).translateExtent(extent).extent(extent).on('zoom', zoomed)
+        return d3.zoom().scaleExtent([1, 10]).translateExtent(extent).extent(extent).on('zoom', zoomed)
       }
 
       this.svg.call(zoomHandler(this))
