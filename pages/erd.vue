@@ -9,9 +9,6 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col lg="10">
-        <D3HeatMap :normalization="normalization" />
-      </v-col>
       <v-col lg="2">
         <v-row justify="center" align="center">
           <v-col lg="8"><v-card-text>Normalize</v-card-text></v-col>
@@ -23,10 +20,13 @@
         <D3DivergingLegend v-if="normalization"></D3DivergingLegend>
         <D3BinaryLegend></D3BinaryLegend>
       </v-col>
+      <v-col lg="10">
+        <D3HeatMap :normalization="normalization" />
+      </v-col>
     </v-row>
-    <!-- <v-row>
+    <v-row>
       <ActionButtons></ActionButtons>
-    </v-row> -->
+    </v-row>
   </v-container>
 </template>
 
