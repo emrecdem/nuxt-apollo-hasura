@@ -191,7 +191,6 @@ export default {
       /**
        * Upload files to the server
        */
-
       const formdata = new FormData()
       const videoBlob = await fetch(this.video.src).then((r) => r.blob())
       formdata.append(this.video.name, videoBlob, this.video.name)
@@ -199,6 +198,7 @@ export default {
       formdata.append(this.transcriptionFile.name, this.transcriptionFile, this.transcriptionFile.name)
       formdata.append(this.silencesFile.name, this.silencesFile, this.silencesFile.name)
       formdata.append(this.topicsFile.name, this.topicsFile, this.topicsFile.name)
+      formdata.append('hash', this.video.hash)
 
       const requestOptions = {
         method: 'POST',
@@ -221,19 +221,19 @@ export default {
           input: {
             audio: {
               class: 'File',
-              path: this.audioFile,
+              path: this.video.hash + '/' + this.audioFile,
             },
             transcription: {
               class: 'File',
-              path: this.transcriptionFile,
+              path: this.video.hash + '/' + this.transcriptionFile,
             },
             silence: {
               class: 'File',
-              path: this.silencesFile,
+              path: this.video.hash + '/' + this.silencesFile,
             },
             topics: {
               class: 'File',
-              path: this.topicsFile,
+              path: this.video.hash + '/' + this.topicsFile,
             },
             gender: this.pitch, // 'man', 'vrouw'
           },

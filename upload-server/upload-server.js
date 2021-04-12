@@ -1,5 +1,7 @@
+const fs = require('fs')
 const express = require('express')
 const fileUpload = require('express-fileupload')
+
 const app = express()
 const port = 7000
 
@@ -7,6 +9,12 @@ const port = 7000
 app.use(fileUpload())
 
 app.post('/upload', function (req, res) {
+  fs.mkdir('./cwl_files/' + req.body.hash, { recursive: true }, (err) => {
+    if (err) {
+      console.log(err)
+    }
+  })
+
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.')
   }
@@ -14,7 +22,7 @@ app.post('/upload', function (req, res) {
   try {
     // Use the mv() method to place the file somewhere on your server
     Object.values(files).map((file) => {
-      const uploadPath = __dirname + '/cwl_files/' + file.name
+      const uploadPath = __dirname + '/cwl_files/' + req.body.hash + '/' + file.name
       file.mv(uploadPath)
     })
   } catch (err) {
