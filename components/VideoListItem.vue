@@ -39,6 +39,7 @@
                     { name: 'Low pitch', value: 'man' },
                   ]"
                   label="Pitch frequency"
+                  :rules="[(v) => !!v || 'Item is required']"
                   outlined
                   required
                 ></v-select>
