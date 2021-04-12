@@ -8,13 +8,15 @@
     <v-col cols="8">
       <div class="font-weight-bold">{{ video.name }}</div>
       <div class="caption grey--text">Sha256: {{ video.hash }}</div>
-      <div class="caption grey--text">src: {{ video.src }}</div>
       <!--              There is no data on the server about this video:-->
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-btn v-if="videoHashes.includes(video.hash)" class="mt-4" color="primary" @click="$emit('onAnaliseVideo')"
+        >Analyze video</v-btn
+      >
+      <v-dialog v-else v-model="dialog" persistent max-width="600px">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" color="warning" :loading="isProcessing" v-on="on" @click="setVideo">
+          <v-btn class="mt-4" v-bind="attrs" color="warning" :loading="isProcessing" v-on="on">
             <v-icon left>mdi-movie-filter-outline</v-icon>
-            Upload Video files || View Details
+            Upload Video files
           </v-btn>
         </template>
         <v-card>
@@ -144,6 +146,7 @@ export default {
   name: 'VideoListItem',
   props: {
     video: { type: Object, default: () => ({}) },
+    videoHashes: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -246,10 +249,6 @@ export default {
           clearInterval(statusInterval)
         }
       }, 1000)
-    },
-    // save selected video in vuex store
-    setVideo() {
-      this.$emit('onAnaliseVideo')
     },
   },
 }

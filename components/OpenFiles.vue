@@ -49,8 +49,12 @@
           </div>
         </div>
         <div v-for="(video, index) in videosList" :key="index">
-          <video-list-item :video="video" @removeVideo="removeVideo(video.id)" @onAnaliseVideo="analiseVideo(video)" />
-          <v-btn text @click="navigateToVideo(video)"> Go</v-btn>
+          <video-list-item
+            :video="video"
+            :video-hashes="videoHashes"
+            @removeVideo="removeVideo(video.id)"
+            @onAnaliseVideo="navigateToVideo(video)"
+          />
         </div>
       </v-card-text>
     </v-card>
@@ -61,6 +65,7 @@
 import { openDB } from 'idb'
 import { sha256 } from 'js-sha256'
 import { nanoid } from 'nanoid'
+import get_video_hashes from '~/apollo/get_video_hashes'
 
 export default {
   name: 'OpenFiles',
@@ -75,6 +80,16 @@ export default {
       directoryHandle: null,
     }
   },
+  apollo: {
+    videos: {
+      query: get_video_hashes,
+    },
+  },
+  computed: {
+    videoHashes() {
+      return this.videos?.map((video) => video.hash) || []
+    },
+  },
   async mounted() {
     // Create DB in indexDB
     this.db = await openDB('db', 1, {
@@ -87,24 +102,7 @@ export default {
     this.requestPermissions()
   },
 
-  // TODO CONTINUE HERE
-  // GET THE SUBSCRIPTION WITH APOLLO SO SEE IF THE DATA ON THE DATABASE FOR THE VIDEOS EXISTING
-  // OR NOT
-  // MOVE THE OPENING FUNCTIONALITY TO HERE.
-  // MAYBE ALSO MOVE THE generating the SHA into a utils file to make cleaner this compoennt.
-  // TODO CONTINUE HERE
-
   methods: {
-    async analiseVideo(video) {
-      console.log('🎹', video)
-
-      // Navigate to the screen if the video is not being processed
-      if (!this.isProcessing) {
-        await this.$store.dispatch('videos/selectVideo', video)
-        // todo
-      }
-    },
-    // todo delete this after making the api call correctly
     navigateToVideo(video) {
       this.$router.push({ name: 'erd', query: { video: video.id } })
     },
