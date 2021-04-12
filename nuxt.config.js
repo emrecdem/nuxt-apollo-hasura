@@ -71,11 +71,11 @@ export default {
       ws: true,
     },
     '/upload': {
-      target: isDev ? 'http://localhost:7000/upload' : 'http://upload_server:7000/upload',
+      target: isDev ? 'http://localhost:7000' : 'http://upload_server:7000',
       ws: true,
     },
     '/jobs': {
-      target: isDev ? 'http://localhost:9050/jobs' : `http://172.17.0.1:7000/upload`,
+      target: isDev ? 'http://localhost:9050' : 'http://172.17.0.1:9050',
       ws: true,
     },
   },
