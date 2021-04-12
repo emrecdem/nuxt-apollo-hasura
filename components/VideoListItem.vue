@@ -133,10 +133,13 @@
   </v-row>
 </template>
 <script>
+import config from '~/nuxt.config'
+const NUXT_XENON_API_KEY = config.publicRuntimeConfig.xenonAPIKey
+
 const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
-  'api-key': 'in1uP28Y1Et9YGp95VLYzhm5Jgd5M1r0CKI7326RHwbVcHGa',
+  'api-key': NUXT_XENON_API_KEY,
 }
 
 export default {

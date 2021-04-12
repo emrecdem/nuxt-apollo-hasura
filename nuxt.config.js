@@ -4,15 +4,11 @@ import colors from 'vuetify/es5/util/colors'
 const isDev = process.env.NODE_ENV !== 'production'
 
 /* nuxt.config.js */
-// only add `router.base = '/<repository-name>/'` if `DEPLOY_ENV` is `GH_PAGES`
-const routerBase =
-  process.env.DEPLOY_ENV === 'GH_PAGES'
-    ? {
-        base: '/nuxt-apollo-hasura/',
-      }
-    : {}
 
 export default {
+  publicRuntimeConfig: {
+    xenonAPIKey: process.env.NUXT_XENON_API_KEY,
+  },
   components: true,
 
   /*
