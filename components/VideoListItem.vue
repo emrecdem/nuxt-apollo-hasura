@@ -99,7 +99,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-btn text @click="triggerCWL"> Trigger CWL</v-btn>
+      <!--      <v-btn text @click="triggerCWL"> Trigger CWL</v-btn>-->
       <div>{{ cwlState }}</div>
 
       <div v-if="cwlState === 'SystemError'" @click="openLogFile">
@@ -188,8 +188,9 @@ export default {
        * Upload files to the server
        */
 
-      // CONTINUE HERE: IT DOESNT UPLOAD THE FILES YET
       const formdata = new FormData()
+      const videoBlob = await fetch(this.video.src).then((r) => r.blob())
+      formdata.append(this.video.name, videoBlob, this.video.name)
       formdata.append(this.audioFile.name, this.audioFile, this.audioFile.name)
       formdata.append(this.transcriptionFile.name, this.transcriptionFile, this.transcriptionFile.name)
       formdata.append(this.silencesFile.name, this.silencesFile, this.silencesFile.name)
@@ -200,12 +201,10 @@ export default {
         body: formdata,
         redirect: 'follow',
       }
-
       fetch('/upload', requestOptions)
         .then((response) => response.text())
         .then((result) => console.log(result))
         .catch((error) => console.log('⛔️ error', error))
-
       /**
        * Trigger CWL workflow
        */
