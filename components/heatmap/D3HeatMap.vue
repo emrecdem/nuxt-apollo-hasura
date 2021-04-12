@@ -362,6 +362,7 @@ export default {
         .style('border-radius', '5px')
         .style('padding', '5px')
         .style('min-width', '300px')
+        .style('z-index', '1111')
       this.yAxisGroup
         .selectAll('.tick')
         .style('cursor', 'pointer')
@@ -434,7 +435,6 @@ export default {
           return myColor(d.value)
         })
         .on('mouseover', (event, d) => {
-          const currentTime = new Date(this.cursor * 1000).toISOString().substr(11, 8)
           if (d.variable === 'topic') {
             tooltip.style('display', 'block')
             tooltip.transition().duration(200).style('opacity', 0.9)
@@ -454,7 +454,7 @@ export default {
                 </div>
                 <div>
                 <span>Time:  </span><span>` +
-                  currentTime +
+                  formatDuration(d.frame) +
                   `</span>
                 </div>
                  <div>
