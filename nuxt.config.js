@@ -3,10 +3,8 @@ import colors from 'vuetify/es5/util/colors'
 // Check if we need to run Nuxt in development mode
 const isDev = process.env.NODE_ENV !== 'production'
 
-/* nuxt.config.js */
-
 export default {
-  publicRuntimeConfig: {
+  env: {
     xenonAPIKey: process.env.NUXT_XENON_API_KEY,
   },
   components: true,
