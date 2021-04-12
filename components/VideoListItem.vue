@@ -201,7 +201,7 @@ export default {
         redirect: 'follow',
       }
 
-      fetch('http://localhost:7000/upload', requestOptions)
+      fetch('/upload', requestOptions)
         .then((response) => response.text())
         .then((result) => console.log(result))
         .catch((error) => console.log('⛔️ error', error))
@@ -209,7 +209,7 @@ export default {
       /**
        * Trigger CWL workflow
        */
-      const response = await fetch('http://localhost:9050/jobs', {
+      const response = await fetch('/jobs', {
         method: 'POST',
         headers,
         body: JSON.stringify({

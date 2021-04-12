@@ -21,7 +21,7 @@ services:
     container_name: erd-upload-server
     command: yarn start
     volumes:
-      - ./upload-server:/usr/src/app
+      - ./upload-server:/usr/src/app/cwl_files
     working_dir: /usr/src/app
     ports:
       - "7000:7000"
