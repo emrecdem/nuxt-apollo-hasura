@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row>
+    <v-row style="max-width: 1320px; margin: 0 auto">
       <v-col lg="6">
         <tabs />
       </v-col>
