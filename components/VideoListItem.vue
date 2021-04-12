@@ -35,7 +35,7 @@
                   class="mt-6 ml-8"
                   dense
                   :items="[
-                    { name: 'High pitch', value: 'woman' },
+                    { name: 'High pitch', value: 'vrouw' },
                     { name: 'Low pitch', value: 'man' },
                   ]"
                   label="Pitch frequency"
@@ -214,29 +214,25 @@ export default {
         headers,
         body: JSON.stringify({
           name: this.video.name,
-          workflow: 'copy.cwl', // TODO change for the correct CWL
+          workflow: 'workflow_single.cwl',
           input: {
-            name: 'It is my second',
-            workflow: 'copy.cwl',
-            input: {
-              audio: {
-                class: 'File',
-                path: this.audioFile,
-              },
-              transcription: {
-                class: 'File',
-                path: this.transcriptionFile,
-              },
-              silence: {
-                class: 'File',
-                path: this.silencesFile,
-              },
-              topics: {
-                class: 'File',
-                path: this.topicsFile,
-              },
-              gender: this.pitch, // 'man', 'woman'
+            audio: {
+              class: 'File',
+              path: this.audioFile,
             },
+            transcription: {
+              class: 'File',
+              path: this.transcriptionFile,
+            },
+            silence: {
+              class: 'File',
+              path: this.silencesFile,
+            },
+            topics: {
+              class: 'File',
+              path: this.topicsFile,
+            },
+            gender: this.pitch, // 'man', 'vrouw'
           },
         }),
       })
