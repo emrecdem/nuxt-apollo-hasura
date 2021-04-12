@@ -14,7 +14,7 @@ services:
       - '9696:3000'
     environment:
       HOST: 0.0.0.0
-      NUXT_XENON_API_KEY: Your Xenon-server api key here'
+      NUXT_XENON_API_KEY: 'Your Xenon-server api key here'
 
   upload_server:
     build: ./upload-server
