@@ -62,22 +62,28 @@ export default {
         .attr('transform', 'translate(0, ' + this.barHeight * 2 + ')')
       this.drawGradientLegend(this.heatmapLegend, 'features', [0, 5], d3.interpolateInferno, 6)
 
-      this.pitchLegend = chartGroup
+      this.prescenceLegend = chartGroup
         .append('g')
         .attr('class', 'topicGroup')
         .attr('transform', 'translate(0, ' + this.barHeight * 7 + ')')
+      this.drawGradientLegend(this.prescenceLegend, 'feature prescence', [0, 1], d3.interpolateInferno, 6)
+
+      this.pitchLegend = chartGroup
+        .append('g')
+        .attr('class', 'topicGroup')
+        .attr('transform', 'translate(0, ' + this.barHeight * 12 + ')')
       this.drawGradientLegend(this.pitchLegend, 'pitch', [0, 255], d3.interpolateViridis, 6)
 
       this.intensityLegend = chartGroup
         .append('g')
         .attr('class', 'topicGroup')
-        .attr('transform', 'translate(0, ' + this.barHeight * 12 + ')')
+        .attr('transform', 'translate(0, ' + this.barHeight * 17 + ')')
       this.drawGradientLegend(this.intensityLegend, 'intensity', [0, 100], d3.interpolatePlasma, 6)
 
       this.silenceLegend = chartGroup
         .append('g')
         .attr('class', 'topicGroup')
-        .attr('transform', 'translate(0, ' + this.barHeight * 17 + ')')
+        .attr('transform', 'translate(0, ' + this.barHeight * 22 + ')')
       this.drawGradientLegend(this.silenceLegend, 'silence', [0, 1], d3.interpolateRdYlGn, 6)
     },
 
