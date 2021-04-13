@@ -221,19 +221,19 @@ export default {
           input: {
             audio: {
               class: 'File',
-              path: this.video.hash + '/' + this.audioFile,
+              path: this.video.hash + '/' + this.audioFile.name,
             },
             transcription: {
               class: 'File',
-              path: this.video.hash + '/' + this.transcriptionFile,
+              path: this.video.hash + '/' + this.transcriptionFile.name,
             },
             silence: {
               class: 'File',
-              path: this.video.hash + '/' + this.silencesFile,
+              path: this.video.hash + '/' + this.silencesFile.name,
             },
             topics: {
               class: 'File',
-              path: this.video.hash + '/' + this.topicsFile,
+              path: this.video.hash + '/' + this.topicsFile.name,
             },
             gender: this.pitch, // 'man', 'vrouw'
           },
