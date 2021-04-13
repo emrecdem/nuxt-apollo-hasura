@@ -1,27 +1,23 @@
 <template>
   <v-container fluid>
     <v-row style="max-width: 1320px; margin: 0 auto">
-      <v-col lg="6">
+      <v-col sm="6" cols="12">
         <tabs />
       </v-col>
-      <v-col lg="6">
+      <v-col sm="6" cols="12">
         <video-player />
       </v-col>
     </v-row>
     <v-row>
-      <v-col lg="2">
-        <v-row justify="center" align="center">
-          <v-col lg="8"><v-card-text>Normalize</v-card-text></v-col>
-          <v-col lg="4"><v-switch v-model="normalization" inset></v-switch></v-col
-        ></v-row>
-
-        <D3TopicsLegend></D3TopicsLegend>
-        <D3GradientLegend v-if="!normalization"></D3GradientLegend>
-        <D3DivergingLegend v-if="normalization"></D3DivergingLegend>
-        <D3BinaryLegend></D3BinaryLegend>
+      <v-col sm="2" cols="12" style="overflow: hidden" class="order-2 order-sm-1">
+        <v-switch v-model="normalization" inset dense label="Normalize" />
+        <HeatmapD3TopicsLegend />
+        <HeatmapD3GradientLegend v-if="!normalization"></HeatmapD3GradientLegend>
+        <HeatmapD3DivergingLegend v-if="normalization"></HeatmapD3DivergingLegend>
+        <HeatmapD3BinaryLegend />
       </v-col>
-      <v-col lg="10">
-        <D3HeatMap :normalization="normalization" />
+      <v-col sm="10" cols="12" class="order-1">
+        <HeatmapD3HeatMap :normalization="normalization" />
       </v-col>
     </v-row>
     <v-row>

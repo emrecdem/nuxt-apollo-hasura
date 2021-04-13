@@ -1,36 +1,33 @@
 <template>
   <div>
-    <v-dialog v-model="exportScreen" scrollable max-width="800">
+    <v-dialog v-model="exportDialog" scrollable max-width="800">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on"> {{ title }} </v-btn>
+        <v-btn color="primary" v-bind="attrs" v-on="on"> {{ title }} </v-btn>
       </template>
       <v-card>
-        <v-row align="center">
-          <v-col sm="10">
-            <v-card-title>Export Features</v-card-title>
-          </v-col>
-          <v-col sm="2">
-            <v-btn color="blue darken-1" text @click="exportScreen = false"> X </v-btn>
-          </v-col>
-        </v-row>
-
-        <v-divider></v-divider>
-        <v-card-title class="pb-0">Aggregates to export for each topic (select multiple):</v-card-title>
-        <v-list class="d-flex">
-          <div v-for="(column, index) in columns" :key="index" class="col">
-            <v-list-item v-for="(item, id) in column" :key="id">
-              <v-checkbox v-model="selected" :label="item" :value="item"></v-checkbox>
-            </v-list-item>
+        <v-card-title>
+          <span class="headline">Export Features</span>
+        </v-card-title>
+        <v-card-text>
+          <div class="body-1 mt-4">Aggregates to export for each topic (select multiple):</div>
+          <div class="d-flex">
+            <div v-for="(column, index) in columns" :key="index" class="col">
+              <v-checkbox
+                v-for="(item, id) in column"
+                :key="id"
+                v-model="selected"
+                :label="item"
+                :value="item"
+                hide-details
+              ></v-checkbox>
+            </div>
           </div>
-        </v-list>
-        <v-divider></v-divider>
-        <v-card-title class="pb-0">Options for duration, occurrence and frequency:</v-card-title>
-        <v-container fluid>
+          <div class="body-1 mt-8 mb-4">Options for duration, occurrence and frequency:</div>
           <v-row class="pl-5">
-            <v-col sm="4">
+            <v-col sm="4" cols="12">
               <v-text-field v-model="threshold" label="Threshold" clearable placeholder="Enter value here" />
             </v-col>
-            <v-col sm="4">
+            <v-col sm="4" cols="12">
               <v-text-field
                 v-model="minimumDuration"
                 label="Minimum duration"
@@ -38,11 +35,13 @@
                 placeholder="Enter value here"
               />
             </v-col>
-            <v-col sm="4">
-              <v-btn @click="exportToCSV">Export To CSV</v-btn>
-            </v-col>
           </v-row>
-        </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="exportDialog = false"> Close </v-btn>
+          <v-btn color="primary" @click="exportToCSV">Export To CSV</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -65,7 +64,7 @@ export default {
         'Frequency (relative occurrence)',
       ],
       selected: [],
-      exportScreen: false,
+      exportDialog: false,
       cols: 2,
       minimumDuration: '',
       threshold: '',
@@ -83,6 +82,8 @@ export default {
   },
   methods: {
     exportToCSV() {
+      this.exportDialog = false
+      // todo
       console.log('Selected Options', this.selected, this.minimumDuration, this.threshold)
     },
   },

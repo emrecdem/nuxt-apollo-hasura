@@ -7,10 +7,10 @@
     <v-card-text style="height: 300px; overflow: auto">
       <v-tabs-items v-model="tab">
         <v-tab-item>
-          <Info />
+          <TabsInfo />
         </v-tab-item>
         <v-tab-item>
-          <FeaturesSelection />
+          <TabsFeaturesSelection />
         </v-tab-item>
       </v-tabs-items>
     </v-card-text>
