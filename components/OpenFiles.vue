@@ -103,7 +103,8 @@ export default {
   },
 
   methods: {
-    navigateToVideo(video) {
+    async navigateToVideo(video) {
+      await this.$store.dispatch('videos/selectVideo', video)
       this.$router.push({ name: 'erd', query: { video: video.id } })
     },
     /**

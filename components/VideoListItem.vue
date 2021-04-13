@@ -9,7 +9,7 @@
       <div class="font-weight-bold">{{ video.name }}</div>
       <div class="caption grey--text">Sha256: {{ video.hash }}</div>
       <!--              There is no data on the server about this video:-->
-      <v-btn v-if="videoHashes.includes(video.hash)" class="mt-4" color="primary" @click="$emit('onAnaliseVideo')"
+      <v-btn v-if="videoHashes.includes(video.hash)" class="mt-4" color="primary" @click="setVideo()"
         >Analyze video</v-btn
       >
       <v-dialog v-else v-model="dialog" persistent max-width="600px">
@@ -249,6 +249,9 @@ export default {
           clearInterval(statusInterval)
         }
       }, 1000)
+    },
+    setVideo() {
+      this.$emit('onAnaliseVideo')
     },
   },
 }
