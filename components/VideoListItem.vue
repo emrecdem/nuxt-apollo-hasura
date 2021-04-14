@@ -136,12 +136,6 @@
   </v-row>
 </template>
 <script>
-const headers = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json',
-  'api-key': process.env.xenonAPIKey,
-}
-
 export default {
   name: 'VideoListItem',
   props: {
@@ -164,6 +158,13 @@ export default {
     }
   },
   computed: {
+    headers() {
+      return {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': this.$config.xenonAPIKey,
+      }
+    },
     isProcessing() {
       return this.cwlState === 'Running' || this.cwlState === 'Waiting'
     },
@@ -172,7 +173,7 @@ export default {
     async openLogFile() {
       const response = await fetch(this.dataStatus.log, {
         method: 'GET',
-        headers,
+        headers: this.headers,
       })
       this.logText = await response.json()
     },
@@ -214,7 +215,7 @@ export default {
        */
       const response = await fetch('/jobs', {
         method: 'POST',
-        headers,
+        headers: this.headers,
         body: JSON.stringify({
           name: this.video.name,
           workflow: 'workflow_single.cwl',
@@ -242,7 +243,7 @@ export default {
       const data = await response.json()
 
       const statusInterval = setInterval(async () => {
-        const statusResponse = await fetch(data.uri, { method: 'GET', headers })
+        const statusResponse = await fetch(data.uri, { method: 'GET', headers: this.headers })
         this.dataStatus = await statusResponse.json()
         this.cwlState = this.dataStatus.state
         if (this.dataStatus.state === 'Success' || this.dataStatus.state === 'SystemError') {

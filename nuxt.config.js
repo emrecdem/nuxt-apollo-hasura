@@ -4,7 +4,7 @@ import colors from 'vuetify/es5/util/colors'
 const isDev = process.env.NODE_ENV !== 'production'
 
 export default {
-  env: {
+  publicRuntimeConfig: {
     xenonAPIKey: process.env.NUXT_XENON_API_KEY,
   },
   components: true,
