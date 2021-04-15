@@ -220,6 +220,10 @@ export default {
           name: this.video.name,
           workflow: 'workflow_single.cwl',
           input: {
+            video: {
+              class: 'File',
+              path: this.video.hash + '/' + this.video.name,
+            },
             audio: {
               class: 'File',
               path: this.video.hash + '/' + this.audioFile.name,
