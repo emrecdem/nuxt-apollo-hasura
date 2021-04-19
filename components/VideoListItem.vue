@@ -251,6 +251,7 @@ export default {
         this.dataStatus = await statusResponse.json()
         this.cwlState = this.dataStatus.state
         if (this.dataStatus.state === 'Success' || this.dataStatus.state === 'SystemError') {
+          this.$emit('fetchVideoHashes')
           clearInterval(statusInterval)
         }
       }, 1000)

@@ -53,6 +53,7 @@
             :video="video"
             :video-hashes="videoHashes"
             @removeVideo="removeVideo(video.id)"
+            @fetchVideoHashes="$apollo.queries.videos.refetch()"
             @onAnaliseVideo="navigateToVideo(video)"
           />
         </div>

@@ -68,6 +68,7 @@ export default {
   proxy: {
     '/graphql': {
       target: isDev ? 'http://localhost:8080/v1' : 'http://hasura:8080/v1',
+      ws: true,
     },
     '/upload': {
       target: isDev ? 'http://localhost:7000' : 'http://upload_server:7000',
