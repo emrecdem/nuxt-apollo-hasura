@@ -206,7 +206,7 @@ export default {
         body: formdata,
         redirect: 'follow',
       }
-      fetch('/upload', requestOptions)
+      await fetch('/upload', requestOptions)
         .then((response) => response.text())
         .then((result) => console.log(result))
         .catch((error) => console.log('⛔️ error', error))
@@ -232,7 +232,7 @@ export default {
               class: 'File',
               path: this.video.hash + '/' + this.transcriptionFile.name,
             },
-            silence: {
+            silences: {
               class: 'File',
               path: this.video.hash + '/' + this.silencesFile.name,
             },
