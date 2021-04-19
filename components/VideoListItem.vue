@@ -105,7 +105,7 @@
       <!--      <v-btn text @click="triggerCWL"> Trigger CWL</v-btn>-->
       <div>{{ cwlState }}</div>
 
-      <div v-if="cwlState === 'SystemError'" @click="openLogFile">
+      <div v-if="cwlState === 'SystemError' || cwlState === 'PermanentFailure'" @click="openLogFile">
         <v-dialog v-model="logDialog" width="900px" scrollable>
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="error" dark v-bind="attrs" small v-on="on" @click="openLogFile"> See log file </v-btn>
