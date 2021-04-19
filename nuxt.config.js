@@ -80,7 +80,7 @@ export default {
         proxyReq.setHeader('X-Forwarded-Server', 'localhost')
         proxyReq.setHeader('X-Forwarded-Proto', 'http')
         proxyReq.setHeader('X-Forwarded-Port', '9696')
-        proxyReq.setHeader('X-Forwarded-Prefix', '/jobs')
+        proxyReq.setHeader('X-Forwarded-Prefix', '')
       },
     },
   },
