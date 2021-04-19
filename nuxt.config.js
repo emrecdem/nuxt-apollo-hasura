@@ -68,15 +68,19 @@ export default {
   proxy: {
     '/graphql': {
       target: isDev ? 'http://localhost:8080/v1' : 'http://hasura:8080/v1',
-      ws: true,
     },
     '/upload': {
       target: isDev ? 'http://localhost:7000' : 'http://upload_server:7000',
-      ws: true,
     },
     '/jobs': {
       target: isDev ? 'http://localhost:9050' : 'http://172.17.0.1:9050',
-      ws: true,
+      onProxyReq(proxyReq) {
+        proxyReq.setHeader('X-Forwarded-Host', 'localhost')
+        proxyReq.setHeader('X-Forwarded-Server', 'localhost')
+        proxyReq.setHeader('X-Forwarded-Proto', 'http')
+        proxyReq.setHeader('X-Forwarded-Port', '9696')
+        proxyReq.setHeader('X-Forwarded-Prefix', '/jobs')
+      },
     },
   },
   /**
