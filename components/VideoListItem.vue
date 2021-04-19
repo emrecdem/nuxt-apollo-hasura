@@ -160,7 +160,6 @@ export default {
   computed: {
     headers() {
       return {
-        Accept: 'application/json',
         'Content-Type': 'application/json',
         'api-key': this.$config.xenonAPIKey,
       }
@@ -175,7 +174,7 @@ export default {
         method: 'GET',
         headers: this.headers,
       })
-      this.logText = await response.json()
+      this.logText = await response.text()
     },
     async validateForm() {
       await this.$refs.form.validate()
