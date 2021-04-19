@@ -1,5 +1,10 @@
 <template>
-  <div v-if="activeFeatures" id="heatmapChart"></div>
+  <div>
+    <div v-if="loading" class="loadingContainer d-flex justify-center align-center">
+      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+    </div>
+    <div v-if="activeFeatures" id="heatmapChart"></div>
+  </div>
 </template>
 
 <script>
@@ -38,6 +43,7 @@ export default {
       margins: { top: 0, right: 20, bottom: 20, left: 50 },
       localCursor: 0,
       topics: [],
+      loading: true,
     }
   },
   computed: {
@@ -278,17 +284,16 @@ export default {
       return extracted
     },
     drawChart() {
+      this.loading = false
       // remove old chart if its there
       d3.select('#heatmapChart').selectAll('*').remove()
       this.chartWidth = this.width - this.margins.left - this.margins.right
       this.chartHeight = this.height - this.margins.top - this.margins.bottom
-
       this.svg = d3.select('#heatmapChart').append('svg').attr('width', this.width).attr('height', this.height)
       const chartGroup = this.svg
         .append('g')
         .attr('class', 'chartGroup')
         .attr('transform', 'translate(' + this.margins.left + ',' + this.margins.top + ')')
-
       // Clipping
       this.defs = chartGroup.append('defs')
       this.defs
@@ -403,6 +408,7 @@ export default {
         pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
         intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
       }
+
       // Group for main content
       this.cells = chartGroup
         .append('g')
@@ -469,14 +475,20 @@ export default {
                 </div>
                 </div>`
               )
-              .style('left', event.layerX + 20 + 'px')
+              .style('left', () => {
+                const toolTipWidth = tooltip.node().getBoundingClientRect().width
+                if (window.innerWidth - event.layerX < 500) {
+                  return event.layerX - toolTipWidth + 'px'
+                } else {
+                  return event.layerX + 20 + 'px'
+                }
+              })
               .style('top', event.layerY + 'px')
               .style('opacity', 1)
           }
         })
         .on('mouseleave', () => tooltip.style('display', 'none'))
       this.cells.exit().remove()
-
       /**
        * Cursor
        */
@@ -586,5 +598,8 @@ export default {
   overscroll-behavior: contain;
   max-width: 100%;
   width: 100%;
+}
+.loadingContainer {
+  height: 500px;
 }
 </style>
