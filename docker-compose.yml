@@ -34,6 +34,6 @@ services:
       - "./hasura/migrations:/hasura-migrations"
       - "./hasura/metadata:/hasura-metadata"
 
+
 volumes:
   db_data:
-

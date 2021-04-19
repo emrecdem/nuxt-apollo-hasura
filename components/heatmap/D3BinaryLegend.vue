@@ -15,7 +15,7 @@ export default {
       x: null,
       yAxis: null,
       xAxis: null,
-      height: 100,
+      height: 80,
       width: 100,
       margins: { top: 0, right: 0, bottom: 0, left: 0 },
     }

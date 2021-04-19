@@ -9,11 +9,11 @@
       </nuxt-link>
       <v-spacer />
     </v-app-bar>
-    <v-main>
+    <v-content>
       <v-container fluid style="margin-top: 26px">
         <nuxt />
       </v-container>
-    </v-main>
+    </v-content>
     <v-footer app class="flex">
       <img
         src="https://www.esciencecenter.nl/wp-content/themes/raadhuis/dist/assets/img/favicons/apple-touch-icon.png"

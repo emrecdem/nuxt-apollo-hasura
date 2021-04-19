@@ -16,6 +16,8 @@ make reset-db-to-defaults
 yarn hasura-console #http://localhost:9596
 ```
 ## Development
+![image](https://user-images.githubusercontent.com/4195550/113403878-9f844780-93a7-11eb-9c64-d17b44eca9f7.png)
+
 ```shell
 yarn dev # http://localhost:3000
 ```
@@ -59,7 +61,7 @@ docker exec -i erd-postgres createdb -U postgres postgres
 ```
 And then, import the data dump and apply the hasura metadata:
 ```shell
-docker exec -i erd-postgres psql --username postgres postgres < ./dump.sql
+docker exec -i erd-postgres psql --username postgres postgres < ./CI/dev-data-dump.sql
 yarn hasura-metadata-apply
 ```
 
@@ -94,10 +96,21 @@ Making test api-calls:
 -   header: "api-key":"in1uP28Y1Et9YGp95VLYzhm5Jgd5M1r0CKI7326RHwbVcHGa"
 -   body/json: {"name": "Workflow name test","workflow": "cwl/sleep.cwl","input": {"time": "3s"}}
 
-Once the response is recieved: you can call again with GET
+Once the response is received: you can call again with GET
 to the uri provided in the response.
 
-create a folder called cwl inside the xenon-flow folder (you got from cloning the repo) and place inside the `sleep.cwl` file you will find in the `CI` folder
+Create a folder called cwl inside the xenon-flow folder (you got from cloning the repo) and place inside the `sleep.cwl` file you will find in the `CI` folder
+
+Open `application.properties` file to disable ssl and choose the port (if needed it).
+```shell
+server.port=9050
+server.ssl.enabled=false
+```
+
+Edit the xenon `config` file, change your local's folder to access the input files.
+```shell
+location: ${XENONFLOW_HOME}
+```
 
 
 # Deploy production

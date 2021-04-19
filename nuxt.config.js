@@ -3,16 +3,10 @@ import colors from 'vuetify/es5/util/colors'
 // Check if we need to run Nuxt in development mode
 const isDev = process.env.NODE_ENV !== 'production'
 
-/* nuxt.config.js */
-// only add `router.base = '/<repository-name>/'` if `DEPLOY_ENV` is `GH_PAGES`
-const routerBase =
-  process.env.DEPLOY_ENV === 'GH_PAGES'
-    ? {
-        base: '/nuxt-apollo-hasura/',
-      }
-    : {}
-
 export default {
+  publicRuntimeConfig: {
+    xenonAPIKey: process.env.NUXT_XENON_API_KEY,
+  },
   components: true,
 
   /*
@@ -73,8 +67,20 @@ export default {
    */
   proxy: {
     '/graphql': {
-      target: isDev ? 'http://localhost:8080/v1' : 'http://hasura:8080/v1',
-      ws: true,
+      target: isDev ? 'http://localhost:8080/v1' : 'http://localhost:8080/v1',
+    },
+    '/upload': {
+      target: isDev ? 'http://localhost:7000' : 'http://localhost:7000',
+    },
+    '/jobs': {
+      target: isDev ? 'http://localhost:9050' : 'http://172.17.0.1:9050',
+      onProxyReq(proxyReq) {
+        proxyReq.setHeader('X-Forwarded-Host', 'localhost')
+        proxyReq.setHeader('X-Forwarded-Server', 'localhost')
+        proxyReq.setHeader('X-Forwarded-Proto', 'http')
+        proxyReq.setHeader('X-Forwarded-Port', '9696')
+        proxyReq.setHeader('X-Forwarded-Prefix', '')
+      },
     },
   },
   /**
@@ -90,11 +96,6 @@ export default {
       },
     },
   },
-
-  router: {
-    ...routerBase,
-  },
-
   /*
    ** Vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module

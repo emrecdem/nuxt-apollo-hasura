@@ -49,7 +49,13 @@
           </div>
         </div>
         <div v-for="(video, index) in videosList" :key="index">
-          <video-list-item :video="video" @removeVideo="removeVideo(video.id)" />
+          <video-list-item
+            :video="video"
+            :video-hashes="videoHashes"
+            @removeVideo="removeVideo(video.id)"
+            @fetchVideoHashes="$apollo.queries.videos.refetch()"
+            @onAnaliseVideo="navigateToVideo(video)"
+          />
         </div>
       </v-card-text>
     </v-card>
@@ -60,6 +66,7 @@
 import { openDB } from 'idb'
 import { sha256 } from 'js-sha256'
 import { nanoid } from 'nanoid'
+import get_video_hashes from '~/apollo/get_video_hashes'
 
 export default {
   name: 'OpenFiles',
@@ -74,6 +81,16 @@ export default {
       directoryHandle: null,
     }
   },
+  apollo: {
+    videos: {
+      query: get_video_hashes,
+    },
+  },
+  computed: {
+    videoHashes() {
+      return this.videos?.map((video) => video.hash) || []
+    },
+  },
   async mounted() {
     // Create DB in indexDB
     this.db = await openDB('db', 1, {
@@ -85,7 +102,12 @@ export default {
     this.indexedDBVideos = (await this.db.getAll('store')) || []
     this.requestPermissions()
   },
+
   methods: {
+    async navigateToVideo(video) {
+      await this.$store.dispatch('videos/selectVideo', video)
+      this.$router.push({ name: 'erd', query: { video: video.id } })
+    },
     /**
      * Open Video File
      */
@@ -133,7 +155,6 @@ export default {
         console.error(e)
       }
     },
-
     async removeVideo(id) {
       this.videosList.splice(
         this.videosList.findIndex((video) => video.id === id),
