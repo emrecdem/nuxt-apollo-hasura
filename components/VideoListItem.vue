@@ -250,7 +250,12 @@ export default {
         const statusResponse = await fetch(data.uri, { method: 'GET', headers: this.headers })
         this.dataStatus = await statusResponse.json()
         this.cwlState = this.dataStatus.state
-        if (this.dataStatus.state === 'Success' || this.dataStatus.state === 'SystemError') {
+        if (
+          this.dataStatus.state === 'Success' ||
+          this.dataStatus.state === 'SystemError' ||
+          this.dataStatus.state === 'Cancelled' ||
+          this.dataStatus.state === 'PermanentFailure'
+        ) {
           this.$emit('fetchVideoHashes')
           clearInterval(statusInterval)
         }
