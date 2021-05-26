@@ -1,7 +1,77 @@
 ![ci](https://github.com/emrecdem/emo-spectre/actions/workflows/ci.yml/badge.svg)
-# Emotion Recognition in Dementia
+# Emo-spectre
 
-## Development
+A tool for visualizing and exploring multimodal features extracted from video.
+
+# Production
+
+The application consists of two major components: the visualization tool (emo-spectre + database) and the data processing pipeline (erd-etl + cwltool + xenonflow). The global architecture is outlined in this image:
+
+![](static/images/erd_deployment.png)
+
+## Prerequisites
+
+* Docker + docker-compose
+* Java 11 (for xenon-flow)
+* Python 3 + cwltool (for data processing)
+
+## Deploy visualization tool
+
+Clone the [emo-spectre](https://github.com/emrecdem/emo-spectre) repository and configure the variables in the .env file:
+
+```
+XENON_API_KEY=in1uP28Y1Et9YGp95VLYzhm5Jgd5M1r0CKI7326RHwbVcHGa
+XENONFLOW_HOME=/home/peter/xenonflow
+
+WEBAPP_PORT=9595
+WEBAPP_HOST=localhost
+WEBAPP_PROTOCOL=http
+
+PRODUCTION_POSTGRES_USER=postgres
+PRODUCTION_POSTGRES_PASSWORD=postgrespassword
+PRODUCTION_HASURA_GRAPHQL_ADMIN_SECRET=adminpassword
+
+ERD_UPLOAD_PATH=/Users/peter/repos/esc/data/erd-upload
+```
+
+ERD_UPLOAD_PATH is the directory where uploaded files will be stored for processing.
+
+**Start the docker containers**
+
+```
+docker-compose -f docker-compose.yml -f docker-compose-production.yml up -d
+```
+
+**Initialize the database**
+```
+docker exec -i erd-postgres psql --username postgres postgres < ./sql/seed.sql
+```
+Note that the metadata for the Hasura container is auto-applied from ./hasura/metadata through the [cli-migrations Hasura image](https://hasura.io/docs/latest/graphql/core/migrations/config-v2/advanced/auto-apply-migrations.html#auto-apply-migrations-v2).
+## Deploy the dataprocessing pipeline
+
+Clone the [erd-etl](https://github.com/emrecdem/erd-etl) repository.
+
+**Install xenon-flow**
+
+First install java and make sure `JAVA_HOME` is set. Then download and unpack the xenon-flow installation:
+
+```
+wget https://github.com/xenon-middleware/xenon-flow/releases/download/1.0-rc1/xenonflow-v1.0-rc1.tar
+mkdir xenonflow
+tar -xf xenonflow-v1.0-rc1.tar -C xenonflow
+```
+
+**Install cwltool**
+```
+pip3 install cwltool
+```
+
+**Run xenon-flow**
+```
+./bin/xenonflow
+```
+
+# Development
 
 Requirements locally: `docker` and `Yarn`.
 
@@ -111,33 +181,3 @@ Edit the xenon `config` file, change your local's folder to access the input fil
 ```shell
 location: ${XENONFLOW_HOME}
 ```
-
-
-# Deploy production
-There are three services that run with docker-compose:
-
-- http-server: Static Nuxt application
-- Postgres: Database
-- hasura: GraphQL API
-
-Steps:
-
-1. Build and run (with default environment variables or from system environment variables):
-```shell
-docker-compose -f docker-compose.yml -f docker-compose-production.yml up -d
-# To force build nuxt application use --build
-docker-compose -f docker-compose.yml -f docker-compose-production.yml up -d --build
-```
-3. Import database.
-
-Import the dump data:
- ```shell
-docker exec -i erd-postgres psql --username postgres postgres < ./dump.sql
- ```
-4. Migrate hasura schema:
-```shell
-yarn hasura-metadata-apply
-```
-
-# Continuous Integration
-Running build with Github actions only for frontend app, not with docker.
