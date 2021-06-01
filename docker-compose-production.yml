@@ -4,22 +4,30 @@
 version: '3.6'
 services:
   app:
-    network_mode: host
     build: ./
     container_name: erd-app
     working_dir: /usr/src/app
     depends_on:
       - postgres
       - hasura
+      - upload_server
+      - xenonflow
+    ports:
+      - 3000:3000
     environment:
       HOST: 0.0.0.0
       NUXT_XENON_API_KEY: '${XENON_API_KEY}'
 
   upload_server:
-    network_mode: host
     build: ./upload-server
     container_name: erd-upload-server
     command: [yarn, start]
     volumes:
-      - /data/erd/files:/usr/src/app/cwl_files
+      - ${ERD_UPLOAD_PATH}:/usr/src/app/cwl_files
     working_dir: /usr/src/app
+
+  xenonflow:
+    image: xenonflow
+    container_name: erd-xenonflow
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

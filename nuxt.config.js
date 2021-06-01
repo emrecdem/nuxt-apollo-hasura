@@ -67,18 +67,18 @@ export default {
    */
   proxy: {
     '/graphql': {
-      target: isDev ? 'http://localhost:8080/v1' : 'http://localhost:8080/v1',
+      target: isDev ? 'http://localhost:8080/v1' : 'http://erd-hasura:8080/v1',
     },
     '/upload': {
-      target: isDev ? 'http://localhost:7000' : 'http://localhost:7000',
+      target: isDev ? 'http://localhost:7000' : 'http://erd-upload-server:7000',
     },
     '/jobs': {
-      target: isDev ? 'http://localhost:9050' : 'http://172.17.0.1:9050',
+      target: isDev ? 'http://localhost:9050' : 'http://erd-xenonflow:8080',
       onProxyReq(proxyReq) {
         proxyReq.setHeader('X-Forwarded-Host', 'localhost')
         proxyReq.setHeader('X-Forwarded-Server', 'localhost')
         proxyReq.setHeader('X-Forwarded-Proto', 'http')
-        proxyReq.setHeader('X-Forwarded-Port', '9696')
+        proxyReq.setHeader('X-Forwarded-Port', '3000')
         proxyReq.setHeader('X-Forwarded-Prefix', '')
       },
     },
