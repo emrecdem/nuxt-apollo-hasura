@@ -23,7 +23,7 @@ services:
     container_name: erd-upload-server
     command: [yarn, start]
     volumes:
-      - ${ERD_UPLOAD_PATH}:/usr/src/app/cwl_files
+      - ${ERD_ETL_PATH}/upload:/usr/src/app/cwl_files
     working_dir: /usr/src/app
 
   xenonflow:
@@ -31,3 +31,13 @@ services:
     container_name: erd-xenonflow
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${ERD_ETL_PATH}:${ERD_ETL_PATH}
+      - /Users/peter/repos/esc/data/erd-etl/tmp:/Users/peter/repos/esc/data/erd-etl/tmp
+    environment:
+      # cwltool will use this path to mount a volume with docker itself, but
+      # because we mount the host's docker socket, the container will be a sibling
+      # and thus use the path on the host
+      # TMPDIR: '${ERD_ETL_PATH}/tmp' # Path on host!
+      # TMPDIR: '/app/cwl/tmp'
+      TMPDIR: '/Users/peter/repos/esc/data/erd-etl/tmp'
+      XENONFLOW_FILES: '${ERD_ETL_PATH}'
