@@ -15,8 +15,10 @@ services:
     ports:
       - 3000:3000
     environment:
-      HOST: 0.0.0.0
       NUXT_XENON_API_KEY: '${XENON_API_KEY}'
+      NUXT_WEBAPP_PORT: '${WEBAPP_PORT}'
+      NUXT_WEBAPP_HOST: '${WEBAPP_HOST}'
+      NUXT_WEBAPP_PROTOCOL: '${WEBAPP_PROTOCOL}'
 
   upload_server:
     build: ./upload-server

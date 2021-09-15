@@ -31,7 +31,7 @@ PRODUCTION_POSTGRES_USER=postgres
 PRODUCTION_POSTGRES_PASSWORD=postgrespassword
 PRODUCTION_HASURA_GRAPHQL_ADMIN_SECRET=adminpassword
 
-ERD_UPLOAD_PATH=/Users/peter/repos/esc/data/erd-etl
+ERD_ETL_PATH=/Users/peter/repos/esc/emrecdem/erd-etl
 ```
 
 `ERD_ETL_PATH` is the directory where the files for processing are stored. They are uploaded to `$ERD_ETL_PATH/upload`.

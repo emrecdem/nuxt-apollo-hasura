@@ -75,10 +75,10 @@ export default {
     '/jobs': {
       target: isDev ? 'http://localhost:9050' : 'http://erd-xenonflow:8080',
       onProxyReq(proxyReq) {
-        proxyReq.setHeader('X-Forwarded-Host', 'localhost')
-        proxyReq.setHeader('X-Forwarded-Server', 'localhost')
-        proxyReq.setHeader('X-Forwarded-Proto', 'http')
-        proxyReq.setHeader('X-Forwarded-Port', '3000')
+        proxyReq.setHeader('X-Forwarded-Host', process.env.NUXT_WEBAPP_HOST)
+        proxyReq.setHeader('X-Forwarded-Server', process.env.NUXT_WEBAPP_HOST)
+        proxyReq.setHeader('X-Forwarded-Proto', process.env.NUXT_WEBAPP_PROTOCOL)
+        proxyReq.setHeader('X-Forwarded-Port', process.env.NUXT_WEBAPP_PORT)
         proxyReq.setHeader('X-Forwarded-Prefix', '')
       },
     },
