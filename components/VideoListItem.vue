@@ -155,6 +155,7 @@ export default {
       dataStatus: null,
       logDialog: false,
       logText: '',
+      jobID: ''
     }
   },
   computed: {
@@ -170,7 +171,7 @@ export default {
   },
   methods: {
     async openLogFile() {
-      const response = await fetch(this.dataStatus.log, {
+      const response = await fetch(`/jobs/${this.jobID}/log`, {
         method: 'GET',
         headers: this.headers,
       })
@@ -245,8 +246,11 @@ export default {
       })
       const data = await response.json()
 
+      this.jobID = data.uri.split('/').at(-1);
+
       const statusInterval = setInterval(async () => {
-        const statusResponse = await fetch(data.uri, { method: 'GET', headers: this.headers })
+        const statusResponse = await fetch(`/jobs/${this.jobID}`, 
+            { method: 'GET', headers: this.headers });
         this.dataStatus = await statusResponse.json()
         this.cwlState = this.dataStatus.state
         if (
