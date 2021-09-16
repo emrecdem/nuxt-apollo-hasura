@@ -12,6 +12,8 @@ services:
   hasura:
     container_name: erd-hasura
     image: hasura/graphql-engine:v1.3.3.cli-migrations-v2
+    ports:
+      - 8080:8080
     depends_on:
       - 'postgres'
     restart: always
