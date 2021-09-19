@@ -73,7 +73,7 @@ export default {
       target: isDev ? 'http://localhost:7000' : 'http://erd-upload-server:7000',
     },
     '/jobs': {
-      target: isDev ? 'http://localhost:9050' : 'http://erd-xenonflow:8080',
+      target: isDev ? 'http://localhost:9050' : 'http://erd-xenonflow:9050',
       onProxyReq(proxyReq) {
         proxyReq.setHeader('X-Forwarded-Host', 'localhost')
         proxyReq.setHeader('X-Forwarded-Server', 'localhost')

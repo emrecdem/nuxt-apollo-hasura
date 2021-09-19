@@ -41,5 +41,5 @@ services:
       # and thus use the path on the host
       # TMPDIR: '${ERD_ETL_PATH}/tmp' # Path on host!
       # TMPDIR: '/app/cwl/tmp'
-      TMPDIR: '${ERD_ETL_PATH}/tmp'
+      TMPDIR: '${ERD_ETL_PATH}/tmp' # This path must already exist on host!!
       XENONFLOW_FILES: '${ERD_ETL_PATH}'
