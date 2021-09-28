@@ -45,7 +45,7 @@ export default {
       normalizationData: [],
       height: 600,
       width: 1000,
-      margins: { top: 0, right: 20, bottom: 20, left: 50 },
+      margins: { top: 0, right: 10, bottom: 20, left: 160 },
       localCursor: 0,
       topics: [],
       loading: true,
@@ -374,7 +374,12 @@ export default {
         .range([this.chartHeight - this.margins.bottom - this.margins.top, 0])
         .domain(this.featuresNames)
         .padding(0.01)
-      this.yAxis = d3.axisLeft(this.yScale)
+      // eslint-disable-next-line prettier/prettier
+      this.yAxis = d3
+        .axisLeft(this.yScale)
+        .tickFormat((d, i) =>
+          this.activeFeatures[i].description ? this.activeFeatures[i].description : this.activeFeatures[i].label
+        )
       this.yAxisGroup = chartGroup
         .append('g')
         .attr('clip-path', 'url(#clipy)')
@@ -389,11 +394,11 @@ export default {
         ._groups[0]?.forEach((d) => {
           d3.select(d)
             .on('mouseover', function (event, data) {
-              if (data.description) {
+              if (data.label) {
                 tooltip.style('display', 'block')
                 tooltip.transition().duration(200).style('opacity', 0.9)
                 tooltip
-                  .html(data.description)
+                  .html(data.label)
                   .style('left', event.layerX + 30 + 'px')
                   .style('top', event.layerY + 'px')
                   .style('opacity', 1)
@@ -552,8 +557,8 @@ export default {
                 <div>
                 <span>Feature:  </span>
                 <span>` +
+                  (d.description ? d.description + ' ' : '') +
                   d.variable +
-                  (d.description ? '-' + d.description : '') +
                   `</span>
                 </div>
                 <div>
