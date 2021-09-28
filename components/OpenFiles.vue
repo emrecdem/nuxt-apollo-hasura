@@ -10,11 +10,11 @@
         <div class="d-flex">
           <v-btn depressed color="default" :disabled="loadingFiles" @click="open">
             <v-icon left> mdi-file-video-outline</v-icon>
-            Open single video
+            Select single video
           </v-btn>
           <v-btn depressed color="primary" :disabled="loadingFiles" class="ml-3" @click="openDirectory">
             <v-icon left>mdi-folder</v-icon>
-            Open folder
+            Select folder
           </v-btn>
 
           <v-spacer class="flex-grow-1" />

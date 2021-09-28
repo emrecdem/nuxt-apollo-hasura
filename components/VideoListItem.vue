@@ -10,18 +10,18 @@
       <div class="caption grey--text">Sha256: {{ video.hash }}</div>
       <!--              There is no data on the server about this video:-->
       <v-btn v-if="videoHashes.includes(video.hash)" class="mt-4" color="primary" @click="setVideo()"
-        >Analyze video</v-btn
+        >Explore video</v-btn
       >
       <v-dialog v-else v-model="dialog" persistent max-width="600px">
         <template v-slot:activator="{ on, attrs }">
           <v-btn class="mt-4" v-bind="attrs" color="warning" :loading="isProcessing" v-on="on">
             <v-icon left>mdi-movie-filter-outline</v-icon>
-            Upload Video files
+            Select additional files and analyze
           </v-btn>
         </template>
         <v-card>
           <v-card-title>
-            <span class="headline">Video files to attach</span>
+            <span class="headline">Additional files and parameters</span>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -37,10 +37,10 @@
                   class="mt-6 ml-8"
                   dense
                   :items="[
-                    { name: 'High pitch', value: 'vrouw' },
-                    { name: 'Low pitch', value: 'man' },
+                    { name: 'High pitch voice', value: 'vrouw' },
+                    { name: 'Low pitch voice', value: 'man' },
                   ]"
-                  label="Pitch frequency"
+                  label="Voice pitch"
                   :rules="[(v) => !!v || 'Item is required']"
                   outlined
                   required
@@ -93,7 +93,6 @@
                 ></v-file-input>
               </v-form>
             </v-container>
-            <small>*complement files for the video </small>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -155,7 +154,7 @@ export default {
       dataStatus: null,
       logDialog: false,
       logText: '',
-      jobID: ''
+      jobID: '',
     }
   },
   computed: {
@@ -246,11 +245,10 @@ export default {
       })
       const data = await response.json()
 
-      this.jobID = data.uri.split('/').at(-1);
+      this.jobID = data.uri.split('/').at(-1)
 
       const statusInterval = setInterval(async () => {
-        const statusResponse = await fetch(`/jobs/${this.jobID}`, 
-            { method: 'GET', headers: this.headers });
+        const statusResponse = await fetch(`/jobs/${this.jobID}`, { method: 'GET', headers: this.headers })
         this.dataStatus = await statusResponse.json()
         this.cwlState = this.dataStatus.state
         if (
