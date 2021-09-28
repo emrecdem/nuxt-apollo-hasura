@@ -136,7 +136,7 @@ export default {
       query: get_topics,
       result({ data }) {
         if (data) {
-          this.topics = data
+          this.topics = [{ index: 0, description: 'Geen beschrijving' }, ...data.topics]
         }
       },
     },
@@ -239,7 +239,7 @@ export default {
       rows.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
           if (feature.label === 'topic') {
-            const d = this.topics.topics.find((topic) => topic.index === row[feature.label])
+            const d = this.topics.find((topic) => topic.index === row[feature.label])
 
             extracted.push({
               frame: row.min_timestamp,
@@ -280,7 +280,7 @@ export default {
       aggregateData.forEach((row) => {
         this.activeFeatures.forEach((feature) => {
           if (feature.label === 'topic') {
-            const d = this.topics.topics.find((topic) => topic.index === row[feature.label])
+            const d = this.topics.find((topic) => topic.index === row[feature.label])
             extracted.push({
               frame: row.min_timestamp,
               variable: feature.label,

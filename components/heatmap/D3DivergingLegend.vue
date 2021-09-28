@@ -74,11 +74,11 @@ export default {
         .attr('transform', 'translate(0, ' + this.barHeight * 12 + ')')
       this.drawDivergingLegend(this.intensityLegend, 'intensity', [0, 100], d3.interpolateRdBu, 6)
 
-      this.silenceLegend = chartGroup
+      this.successLegend = chartGroup
         .append('g')
         .attr('class', 'topicGroup')
         .attr('transform', 'translate(0, ' + this.barHeight * 17 + ')')
-      this.drawDivergingLegend(this.silenceLegend, 'silence', [0, 1], d3.interpolateRdYlGn, 6)
+      this.drawDivergingLegend(this.successLegend, 'success', [0, 1], d3.interpolateRdYlGn, 6)
     },
 
     drawDivergingLegend(d3Group, descriptor, extent, interpolator, ticks) {

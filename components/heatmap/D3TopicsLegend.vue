@@ -58,7 +58,8 @@ export default {
       },
       result({ data, loading, networkStatus }) {
         if (data) {
-          this.topics = data.topics
+          console.log(data)
+          this.topics = [{ index: 0, description: 'Geen beschrijving' }, ...data.topics]
           this.updateChart()
         }
       },

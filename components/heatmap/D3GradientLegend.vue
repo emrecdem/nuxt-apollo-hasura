@@ -80,11 +80,11 @@ export default {
         .attr('transform', 'translate(0, ' + this.barHeight * 17 + ')')
       this.drawGradientLegend(this.intensityLegend, 'intensity', [0, 100], d3.interpolatePlasma, 6)
 
-      this.silenceLegend = chartGroup
+      this.successLegend = chartGroup
         .append('g')
         .attr('class', 'topicGroup')
         .attr('transform', 'translate(0, ' + this.barHeight * 22 + ')')
-      this.drawGradientLegend(this.silenceLegend, 'silence', [0, 1], d3.interpolateRdYlGn, 6)
+      this.drawGradientLegend(this.successLegend, 'success', [0, 1], d3.interpolateRdYlGn, 6)
     },
 
     drawGradientLegend(d3Group, descriptor, extent, interpolator, ticks) {
