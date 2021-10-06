@@ -82,7 +82,9 @@ CREATE TABLE public.agg_result (
     topic bigint,
     pitch double precision,
     intensity double precision,
-    silence boolean
+    silence boolean,
+    sentiment_polarity double precision,
+    sentiment_subjectivity double precision
 );
 
 
@@ -382,7 +384,9 @@ select
   min("topic") as topic,
   avg("pitch"),
   avg("intensity"),
-  bool_and("silence")
+  bool_and("silence"),
+  avg("sentiment_polarity"),
+  avg("sentiment_subjectivity")
 from
   data d inner join videos v
 on d.video = v.id
@@ -1121,7 +1125,9 @@ CREATE TABLE public.data (
     intensity double precision,
     topic bigint,
     silence boolean,
-    video bigint
+    video bigint,
+    sentiment_polarity double precision,
+    sentiment_subjectivity double precision
 );
 
 

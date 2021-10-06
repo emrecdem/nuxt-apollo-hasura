@@ -42,5 +42,7 @@ query aggregate_features($duration: float8!, $resolution: float8!, $hash: String
     min_timestamp
     success
     topic
+    sentiment_polarity
+    sentiment_subjectivity
   }
 }

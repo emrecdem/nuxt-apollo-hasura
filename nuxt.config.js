@@ -95,6 +95,12 @@ export default {
         httpEndpoint: '/graphql',
       },
     },
+    defaultOptions: {
+      $query: {
+        loadingKey: 'loading',
+        fetchPolicy: 'no-cache',
+      },
+    },
   },
   /*
    ** Vuetify module configuration
