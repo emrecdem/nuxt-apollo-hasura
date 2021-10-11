@@ -47,6 +47,8 @@
       - pitch
       - intensity
       - silence
+      - sentiment_polarity
+      - sentiment_subjectivity
       filter: {}
       allow_aggregations: true
 - table:
@@ -774,6 +776,8 @@
       - intensity
       - topic
       - silence
+      - sentiment_polarity
+      - sentiment_subjectivity
       - video
       filter: {}
       allow_aggregations: true
