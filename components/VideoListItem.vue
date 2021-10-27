@@ -7,7 +7,6 @@
     </v-col>
     <v-col cols="8">
       <div class="font-weight-bold">{{ video.name }}</div>
-      <div class="caption grey--text">Sha256: {{ video.hash }}</div>
       <!--              There is no data on the server about this video:-->
       <v-btn v-if="videoHashes.includes(video.hash)" class="mt-4" color="primary" @click="setVideo()"
         >Explore video</v-btn
@@ -141,7 +140,7 @@
         </v-dialog>
       </div>
       <div v-if="isProcessing" class="light-blue--text ml-4">
-        The video is processing. It may take several minutes to complete. You can can come later to this list.
+        The video is processing, which might take up to 30 minutes.
       </div>
     </v-col>
     <v-col cols="1">
@@ -183,7 +182,7 @@ export default {
       }
     },
     isProcessing() {
-      return this.cwlState === 'Running' || this.cwlState === 'Waiting'
+      return this.cwlState === 'Running' || this.cwlState === 'Waiting' || this.cwlState === 'Uploading'
     },
   },
   methods: {
@@ -209,6 +208,9 @@ export default {
       /**
        * Upload files to the server
        */
+      this.cwlState = 'Uploading' // not really a cwl state, but we already want to show something is happening during upload
+      this.$forceUpdate();        // refresh the ui before we start uploading 
+
       const formdata = new FormData()
       const videoBlob = await fetch(this.video.src).then((r) => r.blob())
       formdata.append(this.video.name, videoBlob, this.video.name)
