@@ -82,6 +82,16 @@ export default {
         proxyReq.setHeader('X-Forwarded-Prefix', '')
       },
     },
+    '/output': {
+      target: isDev ? 'http://localhost:9050' : 'http://erd-xenonflow:9050',
+      onProxyReq(proxyReq) {
+        proxyReq.setHeader('X-Forwarded-Host', 'localhost')
+        proxyReq.setHeader('X-Forwarded-Server', 'localhost')
+        proxyReq.setHeader('X-Forwarded-Proto', 'http')
+        proxyReq.setHeader('X-Forwarded-Port', '3000')
+        proxyReq.setHeader('X-Forwarded-Prefix', '')
+      },
+    },
   },
   /**
    * Apollo

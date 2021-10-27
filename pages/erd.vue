@@ -20,14 +20,15 @@
         <HeatmapD3HeatMap :normalization="normalization" />
       </v-col>
     </v-row>
-    <v-row>
-      <ActionButtons></ActionButtons>
+    <v-row justify="end">
+      <v-btn v-on:click="exportCSV">Export to CSV</v-btn>
     </v-row>
   </v-container>
 </template>
 
 <script>
 import get_feature_names from '~/apollo/get_feature_names.gql'
+import get_video_metadata from '~/apollo/get_video_metadata'
 
 export default {
   data() {
@@ -37,6 +38,7 @@ export default {
       cursor: 0,
       featureNames: [],
       normalization: true,
+      video_metadata: {}
     }
   },
   computed: {
@@ -48,6 +50,10 @@ export default {
     },
     featureNamesStore() {
       return this.$store.state.features.featureNames
+    },
+    video_hash() {
+      // Retrieve selected video from vuex store
+      return this.$store.state.videos.selectedVideo?.hash
     },
   },
   apollo: {
@@ -72,6 +78,23 @@ export default {
         this.error = JSON.stringify(error.message)
       },
     },
+    videoMetadata: {
+      variables() {
+        return {
+          hash: this.video_hash,
+        }
+      },
+      query: get_video_metadata,
+      result({ data }) {
+        if (data) {
+          this.video_metadata = data.videoMetadata[0]
+        }
+      },
+      error(error) {
+        this.error = JSON.stringify(error.message)
+        console.error('Error', this.error)
+      },
+    },
   },
   methods: {
     play() {
@@ -82,6 +105,23 @@ export default {
       this.$refs.myvideo.pause()
       this.isPlaying = false
     },
+    exportCSV() {
+      const url = `https://emo-spectre.sharkwing.com/output/job-${this.video_metadata.job_id}/output.csv`
+      const options = {
+        headers: {
+          'api-key': this.$config.xenonAPIKey,
+        }
+      };
+      fetch(url, options)
+        .then(res => res.blob())
+        .then(blob => URL.createObjectURL(blob))
+        .then(href => {
+          Object.assign(document.createElement('a'), {
+            href,
+            download: 'output.csv'
+          }).click();
+        });
+    }
   },
 }
 </script>

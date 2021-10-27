@@ -9,6 +9,7 @@ query get_video_metadata($hash: String) {
     experiment
     memory_type
     memory_index
+    job_id
   }
 }
 

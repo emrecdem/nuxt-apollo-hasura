@@ -216,7 +216,7 @@ export default {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify({
-          name: this.video.name,
+          name: 'job',
           workflow: 'workflow_single.cwl',
           input: {
             video: {
