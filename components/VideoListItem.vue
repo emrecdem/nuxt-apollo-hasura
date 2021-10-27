@@ -29,7 +29,24 @@
                 {{ video.name }}
               </div>
 
+              
               <v-form ref="form" v-model="valid" lazy-validation>
+                <v-select
+                  v-model="language"
+                  item-text="name"
+                  item-value="value"
+                  class="mt-6 ml-8"
+                  dense
+                  :items="[
+                    { name: 'English', value: 'en' },
+                    { name: 'Dutch', value: 'nl' },
+                  ]"
+                  label="Language"
+                  :rules="[(v) => !!v || 'Item is required']"
+                  outlined
+                  required
+                ></v-select>
+                
                 <v-select
                   v-model="pitch"
                   item-text="name"
@@ -149,6 +166,7 @@ export default {
       transcriptionFile: null,
       silencesFile: null,
       topicsFile: null,
+      language: '',
       pitch: '',
       cwlState: null,
       dataStatus: null,
@@ -240,6 +258,7 @@ export default {
               path: this.video.hash + '/' + this.topicsFile.name,
             },
             gender: this.pitch, // 'man', 'vrouw'
+            language: this.language, // en|nl
           },
         }),
       })
