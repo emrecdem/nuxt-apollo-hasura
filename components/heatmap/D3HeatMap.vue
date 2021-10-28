@@ -262,10 +262,11 @@ export default {
       return extracted
     },
     deUnderscore(aggregate) {
-      const result = []
+      const result = {}
       const keys = Object.keys(aggregate.avg)
-      keys.forEach(function (key) {
-        result[key.replace(/_/i, '').toLowerCase()] = {
+      keys.forEach(key => {
+        const mappedKey = key.startsWith('AU') ? key.replace(/_/i, '').toLowerCase() : key;
+        result[mappedKey] = {
           average: aggregate.avg[key],
           stddev: aggregate.stddev[key],
         }
@@ -485,16 +486,20 @@ export default {
       const successColor = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateRdYlGn)
       const silenceColor = d3.scaleOrdinal(d3.schemeSet1)
 
-      let myColor = d3.scaleSequential().domain([0, 5]).interpolator(d3.interpolateInferno)
-      let myColorC = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateInferno)
-      let pitchColor = d3.scaleSequential().domain([0, 255]).interpolator(d3.interpolateViridis)
-      let intensityColor = d3.scaleSequential().domain([0, 100]).interpolator(d3.interpolatePlasma)
+      let actionUnitIntensityColor = d3.scaleSequential().domain([0, 5]).interpolator(d3.interpolateInferno)
+      let actionUnitPresenceColor = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateInferno)
+      let audioPitchColor = d3.scaleSequential().domain([0, 255]).interpolator(d3.interpolateInferno)
+      let audioIntensityColor = d3.scaleSequential().domain([0, 100]).interpolator(d3.interpolateInferno)
+      let sentimentPolarityColor = d3.scaleDiverging().domain([-1, 0, 1]).interpolator(d3.interpolatePuOr)
+      let sentimentSubjectivityColor = d3.scaleSequential().domain([0, 1]).interpolator(d3.interpolateInferno)
 
       if (this.normalization) {
-        myColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
-        myColorC = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
-        pitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePiYG)
-        intensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolateRdBu)
+        actionUnitIntensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        actionUnitPresenceColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        audioPitchColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        audioIntensityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        sentimentPolarityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
+        sentimentSubjectivityColor = d3.scaleDiverging().domain([-2.5, 0, 2.5]).interpolator(d3.interpolatePuOr)
       }
       const tooltip = this.tooltip()
       const that = this
@@ -517,30 +522,28 @@ export default {
             return topicColor(d.value)
           } else if (d.variable === 'success') {
             return successColor(d.value)
-          } else if (d.variable.endsWith('c')) {
-            if (that.normalize) {
-              return myColorC(d.zscore)
-            } else {
-              return myColorC(d.value)
-            }
           } else if (d.variable === 'pitch') {
             if (that.normalize) {
-              return pitchColor(d.zscore)
+              return audioPitchColor(d.zscore)
             } else {
-              return pitchColor(d.value)
+              return audioPitchColor(d.value)
             }
           } else if (d.variable === 'intensity') {
             if (that.normalize) {
-              return intensityColor(d.zscore)
+              return audioIntensityColor(d.zscore)
             } else {
-              return intensityColor(d.value)
+              return audioIntensityColor(d.value)
             }
           } else if (d.variable === 'silence') {
             return silenceColor(d.value)
-          } else if (that.normalize) {
-            return myColor(d.zscore)
-          } else {
-            return myColor(d.value)
+          } else if (d.variable === 'sentiment_polarity') {
+            return sentimentPolarityColor(that.normalize ? d.zscore : d.value);
+          } else if (d.variable === 'sentiment_subjectivity') {
+            return sentimentSubjectivityColor(that.normalize ? d.zscore : d.value);
+          } else if (d.variable.startsWith('au') && d.variable.endsWith('c')) {
+            return actionUnitPresenceColor(that.normalize ? d.zscore : d.value);
+          } else if (d.variable.startsWith('au') && d.variable.endsWith('r')) {
+            return actionUnitIntensityColor(that.normalize ? d.zscore : d.value);
           }
         })
         .on('mouseover', (event, d) => {

@@ -39,6 +39,8 @@ query data_aggregate($video: bigint) {
         AU45_r
         intensity
         pitch
+        sentiment_polarity
+        sentiment_subjectivity
       }
       avg {
         AU01_c
@@ -78,6 +80,8 @@ query data_aggregate($video: bigint) {
         AU45_r
         intensity
         pitch
+        sentiment_polarity
+        sentiment_subjectivity
       }
     }
   }
