@@ -1,0 +1,29 @@
+{
+  "creators": [
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Kok, Peter",
+      "orcid": "0000-0002-6630-7326"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Gonzalez, Jesus G.",
+      "orcid": "0000-0002-2170-3253"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Pawar, Pushpanjali"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Weel, Berend",
+      "orcid": "0000-0002-9693-9332"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "van Meersbergen, Maarten",
+      "orcid": "0000-0002-9585-4142"
+    }
+  ],
+  "title": "Emo-spectre"
+}
