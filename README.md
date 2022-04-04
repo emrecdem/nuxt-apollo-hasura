@@ -1,4 +1,6 @@
 ![ci](https://github.com/emrecdem/emo-spectre/actions/workflows/ci.yml/badge.svg)
+[![DOI](https://zenodo.org/badge/270940268.svg)](https://zenodo.org/badge/latestdoi/270940268)
+
 # Emo-spectre
 
 A tool for visualizing and exploring multimodal features extracted from video.
