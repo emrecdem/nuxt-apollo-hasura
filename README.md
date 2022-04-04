@@ -3,27 +3,33 @@
 
 A tool for visualizing and exploring multimodal features extracted from video.
 
-# Production
+## Deployment
 
-The application consists of two major components: the visualization tool (emo-spectre + database) and the data processing pipeline (erd-etl + cwltool + xenonflow). The global architecture is outlined in this image:
+The application consists of two major components: the visualization tool (emo-spectre + api + database) and the data processing pipeline (erd-etl + cwltool + xenonflow). The global architecture is outlined in this image:
 
 ![](static/images/erd_deployment.png)
+TODO: update figure as xenonflow and cwltool are now running in a docker container and don't require local installation.
 
-## Prerequisites
+For production, the application can be launched as a set of Docker containers. For development, see below.
 
-* Docker + docker-compose
-* Java 11 (for xenon-flow)
-* Python 3 + cwltool (for data processing)
+Clone these repositories:
+* emo-spectre: https://github.com/emrecdem/emo-spectre
+* erd-etl: https://github.com/emrecdem/erd-etl
+* xenon-flow: https://github.com/emrecdem/xenon-flow and switch to the erd-changes branch.
 
-## Deploy visualization tool
+### Configure emo-spectre
 
-Clone the [emo-spectre](https://github.com/emrecdem/emo-spectre) repository and configure the variables in the .env file:
+Change the api keys and passwords from their default, and make sure that they are matching between configuration files.
+
+Edit the .env file:
 
 ```
 XENON_API_KEY=in1uP28Y1Et9YGp95VLYzhm5Jgd5M1r0CKI7326RHwbVcHGa
 XENONFLOW_HOME=/home/peter/xenonflow
 
-WEBAPP_PORT=9595
+DOCKER_NETWORK=emo-spectre_default
+
+WEBAPP_PORT=3000
 WEBAPP_HOST=localhost
 WEBAPP_PROTOCOL=http
 
@@ -32,11 +38,53 @@ PRODUCTION_POSTGRES_PASSWORD=postgrespassword
 PRODUCTION_HASURA_GRAPHQL_ADMIN_SECRET=adminpassword
 
 ERD_ETL_PATH=/Users/peter/repos/esc/emrecdem/erd-etl
+
+NODE_ENV=production
 ```
 
-`ERD_ETL_PATH` is the directory where the files for processing are stored. They are uploaded to `$ERD_ETL_PATH/upload`.
+`ERD_ETL_PATH` points to the erd-etl repository, which is also used as the directory where the files for processing are stored. The upload server, xenonflow and cwltool will create/use some directories under `$ERD_ETL_PATH` for temporary storage, namely `upload`, `running-jobs`, `output` and `tmp`.
 
-**Start the docker containers**
+### Configure and build erd-etl
+
+In erd-etl/merge_features.cwl, the database connection needs to be configured:
+
+```
+DB_CONNECTION: postgresql://postgres:<pwd>@<ip address of database container>:5432/postgres
+```
+
+**Build erd-etl**
+
+This and below image are referred to by the CWL scripts that execute the data processing steps. They will be run by the Xenonflow container (as siblings).
+```
+cd scripts
+docker build -t erd-etl .
+cd ..
+docker save erd-etl > erd-etl.tar
+```
+
+**Build erd-praat**
+```
+cd praat
+docker build -t erd-praat
+cd ..
+docker save erd-praat > erd-praat.tar
+```
+
+### Configure and build xenon-flow
+
+In xenon-flow/config/application.properties, edit the following:
+* `xenonflow.http.auth-token` (should match XENON_API_KEY in emo-spectre/.env)
+* `spring.datasource.password`
+* `server.ssl.key-store-password`
+
+Build xenon-flow:
+```
+docker build -t xenonflow .
+```
+
+## Start the docker containers
+
+The command below executes two docker-compose files, one that launches Postgres and Hasura, the other launches Xenonflow, a simple upload server and the actual web application.
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose-production.yml up -d
@@ -47,33 +95,10 @@ docker-compose -f docker-compose.yml -f docker-compose-production.yml up -d
 docker exec -i erd-postgres psql --username postgres postgres < ./sql/seed.sql
 ```
 Note that the metadata for the Hasura container is auto-applied from ./hasura/metadata through the [cli-migrations Hasura image](https://hasura.io/docs/latest/graphql/core/migrations/config-v2/advanced/auto-apply-migrations.html#auto-apply-migrations-v2).
-## Deploy the dataprocessing pipeline
-
-Clone the [erd-etl](https://github.com/emrecdem/erd-etl) repository.
-
-**Install xenon-flow**
-
-First install java and make sure `JAVA_HOME` is set. Then download and unpack the xenon-flow installation:
-
-```
-wget https://github.com/xenon-middleware/xenon-flow/releases/download/1.0-rc1/xenonflow-v1.0-rc1.tar
-mkdir xenonflow
-tar -xf xenonflow-v1.0-rc1.tar -C xenonflow
-```
-
-**Install cwltool**
-```
-pip3 install cwltool
-```
-
-**Run xenon-flow**
-```
-./bin/xenonflow
-```
 
 # Development
 
-Requirements locally: `docker` and `Yarn`.
+Requirements locally: `docker` and `yarn`.
 
 ## First time setup
 ```bash
