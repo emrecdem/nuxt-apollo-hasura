@@ -1,0 +1,28 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Emo-spectre
+message: Please cite this software using these metadata.
+type: software
+authors:
+  - given-names: Peter
+    family-names: Kok
+    email: p.kok@esciencecenter.nl
+    affiliation: Netherlands eScience Center
+    orcid: 'https://orcid.org/0000-0002-6630-7326'
+  - orcid: 'https://orcid.org/0000-0002-2170-3253'
+    given-names: Jesus G.
+    family-names: Gonzalez
+    affiliation: Netherlands eScience Center
+  - family-names: Pawar
+    given-names: Pushpanjali
+    affiliation: Netherlands eScience Center
+  - orcid: 'https://orcid.org/0000-0002-9693-9332'
+    given-names: Berend
+    family-names: Weel
+    affiliation: Netherlands eScience Center
+  - orcid: 'https://orcid.org/0000-0002-9585-4142'
+    given-names: Maarten
+    family-names: van Meersbergen
+    affiliation: Netherlands eScience Center
